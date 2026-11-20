@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨水与触手：深海牌局 | Ink & Tentacles</title>
+<style>
+  :root {
+    --bg-deep: #071926;
+    --bg-panel: #0d2b3e;
+    --bg-card: #f7f1e3;
+    --ink: #1a1a2e;
+    --accent-teal: #2ec4b6;
+    --accent-coral: #ff595e;
+    --accent-gold: #ffca3a;
+    --accent-purple: #9b5de5;
+    --accent-green: #8ac926;
+    --border-ink: 3px solid #121820;
+    --shadow-ink: 4px 4px 0px #121820;
+  }
+  * { box-sizing: border-box; user-select: none; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(circle at 50% 20%, #0f3a52 0%, #061520 100%);
+    color: #f1faee;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  /* 顶部状态栏 */
+  #topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 18px;
+    background: #09202e;
+    border-bottom: var(--border-ink);
+    gap: 12px;
+    flex-wrap: wrap;
+    z-index: 20;
+  }
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #13384f;
+    border: 2px solid #121820;
+    box-shadow: 2px 2px 0 #121820;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .relic-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .relic-icon {
+    width: 32px;
+    height: 32px;
+    background: #1b4965;
+    border: 2px solid #121820;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    cursor: help;
+    position: relative;
+  }
+  .relic-icon:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: 38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #121820;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    border: 1px solid var(--accent-gold);
+  }
+  .btn {
+    background: var(--accent-gold);
+    color: var(--ink);
+    border: var(--border-ink);
+    box-shadow: var(--shadow-ink);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.08s;
+  }
+  .btn:hover { transform: translate(-1px, -1px); }
+  .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #121820; }
+  .btn-teal { background: var(--accent-teal); }
+  .btn-coral { background: var(--accent-coral); color: #fff; }
+  .btn-purple { background: var(--accent-purple); color: #fff; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  /* 主舞台 */
+  #main-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    position: relative;
+  }
+
+  /* 标题界面 */
+  .title-screen {
+    text-align: center;
+    max-width: 720px;
+    background: rgba(13, 43, 62, 0.92);
+    border: var(--border-ink);
+    box-shadow: 8px 8px 0 #121820;
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .title-screen h1 {
+    font-size: 38px;
+    margin: 0 0 8px;
+    color: var(--accent-gold);
+    text-shadow: 3px 3px 0 #121820;
+  }
+  .title-screen p { color: #cbe4f0; line-height: 1.6; }
+
+  /* 地图界面 */
+  #map-screen {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(13, 43, 62, 0.9);
+    border: var(--border-ink);
+    box-shadow: 8px 8px 0 #121820;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+  }
+  .map-nodes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0;
+    overflow-x: auto;
+    padding: 12px 4px;
+  }
+  .map-node {
+    min-width: 95px;
+    padding: 12px 8px;
+    border-radius: 14px;
+    border: var(--border-ink);
+    background: #18435a;
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 0.55;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .map-node.done { background: #1d5b4c; opacity: 0.75; }
+  .map-node.current {
+    background: var(--accent-gold);
+    color: var(--ink);
+    opacity: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow-ink);
+    transform: scale(1.06);
+  }
+  .map-node .node-ico { font-size: 26px; }
+  .map-node .node-lbl { font-size: 12px; font-weight: 800; }
+
+  /* 战斗界面 */
+  #battle-screen {
+    width: 100%;
+    max-width: 1120px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .arena {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: end;
+    background: linear-gradient(180deg, rgba(16, 56, 79, 0.75) 0%, rgba(7, 25, 38, 0.9) 100%);
+    border: var(--border-ink);
+    box-shadow: var(--shadow-ink);
+    border-radius: 18px;
+    padding: 18px 24px;
+    min-height: 250px;
+    position: relative;
+  }
+  .fighter-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .fighter-art {
+    width: 148px;
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+  }
+  .fighter-art.shake { animation: shake 0.3s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px) rotate(-3deg); }
+    75% { transform: translateX(8px) rotate(3deg); }
+  }
+  .hp-bar-wrap {
+    width: 210px;
+    height: 20px;
+    background: #121820;
+    border-radius: 999px;
+    border: 2px solid #121820;
+    overflow: hidden;
+    position: relative;
+  }
+  .hp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff595e, #ff7b7f);
+    transition: width 0.25s;
+  }
+  .hp-bar-fill.player { background: linear-gradient(90deg, #2ec4b6, #56e39f); }
+  .hp-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .status-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 24px;
+  }
+  .badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 2px solid #121820;
+  }
+  .badge-block { background: #4ea8de; color: #fff; }
+  .badge-poison { background: #8ac926; color: #121820; }
+  .badge-shock { background: #ffca3a; color: #121820; }
+  .badge-thorns { background: #ff924c; color: #121820; }
+
+  .intent-bubble {
+    background: #fff;
+    color: var(--ink);
+    border: var(--border-ink);
+    box-shadow: 3px 3px 0 #121820;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  /* 战斗控制条 */
+  .battle-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .energy-orb {
+    background: var(--accent-teal);
+    color: var(--ink);
+    border: var(--border-ink);
+    box-shadow: var(--shadow-ink);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 16px;
+  }
+
+  /* 手牌区 */
+  #hand-area {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: 215px;
+    padding: 8px 4px;
+  }
+  .card {
+    width: 146px;
+    min-height: 204px;
+    background: var(--bg-card);
+    color: var(--ink);
+    border: var(--border-ink);
+    box-shadow: var(--shadow-ink);
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    position: relative;
+  }
+  .card:hover:not(.unplayable) {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 6px 12px 0 #121820;
+    z-index: 10;
+  }
+  .card.unplayable {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+  .card.devour-ready {
+    border-color: #ff595e;
+    box-shadow: 0 0 0 2px #ffca3a, 4px 4px 0 #121820;
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+  }
+  .card-cost {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    border: 2px solid #121820;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .card-name {
+    font-weight: 900;
+    font-size: 13px;
+    text-align: right;
+    line-height: 1.1;
+  }
+  .card-art {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9e0cc;
+    border: 2px solid #121820;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+  .card-type {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 3px;
+  }
+  .type-bait { background: #ffd166; }
+  .type-shell { background: #4ea8de; color: #fff; }
+  .type-predator { background: #ff595e; color: #fff; }
+  .type-bird { background: #9b5de5; color: #fff; }
+  .type-giant { background: #1982c4; color: #fff; }
+  .type-plant { background: #8ac926; }
+  .card-desc {
+    font-size: 11px;
+    line-height: 1.32;
+    font-weight: 600;
+    color: #222;
+  }
+
+  /* 弹窗（奖励、商店、休息、牌库） */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 12, 18, 0.82);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-box {
+    background: #0d2b3e;
+    border: var(--border-ink);
+    box-shadow: 8px 8px 0 #121820;
+    border-radius: 18px;
+    padding: 22px;
+    max-width: 820px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    text-align: center;
+  }
+  .modal-cards {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  #combat-log {
+    font-size: 12px;
+    color: #a8dadc;
+    text-align: center;
+    min-height: 18px;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <span class="stat-pill">🐙 拟态小章鱼·墨仔</span>
+    <span class="stat-pill" id="ui-hp">❤️ 65/65</span>
+    <span class="stat-pill" id="ui-gold">🪙 50</span>
+    <span class="stat-pill" id="ui-act">🌊 第1幕 · 浅海珊瑚礁</span>
+  </div>
+  <div class="relic-bar" id="ui-relics"></div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-sm btn-teal" onclick="openDeckModal()">🃏 牌库 (<span id="ui-deck-count">10</span>)</button>
+    <button class="btn btn-sm" id="btn-mute" onclick="toggleMute()">🔊 音效</button>
+  </div>
+</div>
+
+<div id="main-stage">
+  <!-- 标题画面 -->
+  <div id="title-screen" class="title-screen">
+    <div id="title-hero-art" style="margin-bottom:10px;"></div>
+    <h1>墨水与触手：深海牌局</h1>
+    <p>
+      你是拟态小章鱼 <b>墨仔</b>（<i>Thaumoctopus mimicus</i>）。<br>
+      海底的头足类霸主们正在争夺深海领地！用你收集的海洋生物卡牌——<br>
+      从 0 费小磷虾、带刺海胆、海带珊瑚，到吞噬小鱼爆发的虎鲸与大白鲨——<br>
+      一路击败各路乌贼、鹦鹉螺与巨型章鱼，直面最终深渊霸主：<b>大王酸浆鱿</b>！
+    </p>
+    <div style="margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-teal" style="font-size:18px;padding:12px 28px;" onclick="startNewRun()">🌊 开始深海冒险</button>
+    </div>
+  </div>
+
+  <!-- 地图画面 -->
+  <div id="map-screen" class="hidden">
+    <h2 id="map-act-title" style="margin:0 0 6px;color:var(--accent-gold);">第1幕：浅海珊瑚礁</h2>
+    <p style="margin:0;color:#bde0fe;font-size:14px;">点击高亮的节点前进，击败幕底头足类 Boss 进入下一海域</p>
+    <div class="map-nodes" id="map-nodes"></div>
+  </div>
+
+  <!-- 战斗画面 -->
+  <div id="battle-screen" class="hidden">
+    <div class="arena">
+      <!-- 玩家 -->
+      <div class="fighter-box">
+        <div class="status-row" id="player-status"></div>
+        <div class="fighter-art" id="player-art"></div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar-fill player" id="player-hp-bar" style="width:100%"></div>
+          <div class="hp-text" id="player-hp-text">65 / 65</div>
+        </div>
+        <div style="font-weight:800;font-size:14px;">拟态小章鱼 · 墨仔</div>
+      </div>
+
+      <!-- 敌人 -->
+      <div class="fighter-box">
+        <div class="intent-bubble" id="enemy-intent">⚔️ 准备攻击 8</div>
+        <div class="status-row" id="enemy-status"></div>
+        <div class="fighter-art" id="enemy-art"></div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar-fill" id="enemy-hp-bar" style="width:100%"></div>
+          <div class="hp-text" id="enemy-hp-text">40 / 40</div>
+        </div>
+        <div style="font-weight:800;font-size:14px;" id="enemy-name">曼氏无针乌贼</div>
+        <div style="font-size:11px;color:#90e0ef;" id="enemy-species">Sepiella maindroni</div>
+      </div>
+    </div>
+
+    <div id="combat-log">战斗开始！打出你的海洋生物卡牌吧~</div>
+
+    <div class="battle-controls">
+      <div class="energy-orb" id="ui-energy">⚡ 洋流 3 / 3</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <span style="font-size:13px;color:#bde0fe;">抽牌堆: <b id="ui-draw-pile">0</b> | 弃牌堆: <b id="ui-discard-pile">0</b></span>
+        <button class="btn btn-coral" onclick="endPlayerTurn()">⏭️ 结束回合</button>
+      </div>
+    </div>
+
+    <div id="hand-area"></div>
+  </div>
+</div>
+
+<!-- 通用弹窗 -->
+<div id="modal" class="modal-backdrop">
+  <div class="modal-box" id="modal-content"></div>
+</div>
+
+<script>
+// ==================== 1. WebAudio 合成音效 ====================
+const AudioSys = {
+  ctx: null,
+  muted: false,
+  init() {
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  },
+  play(type) {
+    if (this.muted) return;
+    this.init();
+    const ctx = this.ctx;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'card') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.08);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc.start(now); osc.stop(now + 0.09);
+    } else if (type === 'hit') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(55, now + 0.14);
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.start(now); osc.stop(now + 0.15);
+    } else if (type === 'devour') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(360, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(90, now + 0.24);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    } else if (type === 'win') {
+      osc.type = 'sine';
+      [523, 659, 784, 1046].forEach((f, i) => {
+        osc.frequency.setValueAtTime(f, now + i * 0.08);
+      });
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    }
+  }
+};
+function toggleMute() {
+  AudioSys.muted = !AudioSys.muted;
+  document.getElementById('btn-mute').textContent = AudioSys.muted ? '🔇 静音' : '🔊 音效';
+}
+
+// ==================== 2. Finbred 风格手绘 SVG 生成器 ====================
+function svgWrap(inner, vb = "0 0 120 120") {
+  return `<svg viewBox="${vb}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+// 主角：拟态小章鱼·墨仔
+function getPlayerSVG() {
+  return svgWrap(`
+    <g stroke="#121820" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- 触手 -->
+      <path d="M35 78 Q18 92 22 106 Q28 110 34 96" fill="#f4a261"/>
+      <path d="M46 82 Q38 102 44 112 Q52 112 52 94" fill="#f4a261"/>
+      <path d="M62 82 Q64 104 72 110 Q78 106 72 90" fill="#f4a261"/>
+      <path d="M78 78 Q94 94 98 104 Q104 98 88 84" fill="#f4a261"/>
+      <!-- 头部（拟态斑纹） -->
+      <ellipse cx="60" cy="52" rx="34" ry="30" fill="#ff9f1c"/>
+      <path d="M36 42 Q48 34 56 44" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M70 36 Q82 40 84 52" fill="none" stroke="#121820" stroke-width="3"/>
+      <!-- 大眼睛 -->
+      <circle cx="46" cy="54" r="9" fill="#fff"/>
+      <circle cx="74" cy="54" r="9" fill="#fff"/>
+      <circle cx="48" cy="54" r="4" fill="#121820"/>
+      <circle cx="72" cy="54" r="4" fill="#121820"/>
+      <!-- 自信小嘴 -->
+      <path d="M54 68 Q60 74 66 68" fill="none"/>
+    </g>
+  `);
+}
+
+// 12种头足类对手独立 SVG
+function getEnemySVG(id) {
+  const map = {
+    sepiella: `<g stroke="#121820" stroke-width="3.5" stroke-linejoin="round">
+      <ellipse cx="60" cy="48" rx="28" ry="34" fill="#a8dadc"/>
+      <path d="M32 52 Q20 62 32 72 M88 52 Q100 62 88 72" fill="#457b9d"/>
+      <path d="M42 80 L38 106 M54 82 L54 110 M66 82 L66 110 M78 80 L82 106" stroke-width="5"/>
+      <circle cx="48" cy="52" r="7" fill="#fff"/><circle cx="72" cy="52" r="7" fill="#fff"/>
+      <path d="M45 52 L51 52 M69 52 L75 52" stroke-width="3"/>
+    </g>`,
+    short_octopus: `<g stroke="#121820" stroke-width="3.5">
+      <circle cx="60" cy="50" r="28" fill="#e76f51"/>
+      <path d="M38 74 Q26 98 34 108 M52 78 L50 108 M68 78 L70 108 M82 74 Q94 98 86 108" fill="none" stroke-width="5"/>
+      <circle cx="48" cy="48" r="6" fill="#ffca3a"/><circle cx="72" cy="48" r="6" fill="#ffca3a"/>
+      <circle cx="48" cy="48" r="2.5" fill="#121820"/><circle cx="72" cy="48" r="2.5" fill="#121820"/>
+    </g>`,
+    flamboyant: `<g stroke="#121820" stroke-width="3.5">
+      <polygon points="60,16 90,58 76,82 44,82 30,58" fill="#ff006e"/>
+      <polygon points="60,26 78,56 60,72 42,56" fill="#ffbe0b"/>
+      <path d="M44 82 L36 108 M60 82 L60 112 M76 82 L84 108" stroke="#8338ec" stroke-width="5"/>
+      <circle cx="48" cy="54" r="6" fill="#fff"/><circle cx="72" cy="54" r="6" fill="#fff"/>
+      <circle cx="48" cy="54" r="3" fill="#121820"/><circle cx="72" cy="54" r="3" fill="#121820"/>
+    </g>`,
+    nautilus: `<g stroke="#121820" stroke-width="3.5">
+      <circle cx="62" cy="56" r="38" fill="#f4f1de"/>
+      <path d="M62 56 m-24 0 a 24 24 0 1 0 48 0 a 16 16 0 1 0 -32 0 a 8 8 0 1 0 16 0" fill="none" stroke="#e07a5f" stroke-width="4"/>
+      <path d="M26 64 L12 72 M26 72 L10 84 M30 80 L18 96" stroke="#e07a5f" stroke-width="4"/>
+      <circle cx="38" cy="56" r="6" fill="#121820"/>
+    </g>`,
+    blue_ring: `<g stroke="#121820" stroke-width="3.5">
+      <circle cx="60" cy="50" r="32" fill="#ffd166"/>
+      <circle cx="44" cy="36" r="6" fill="#00bbf9" stroke="#121820" stroke-width="2"/>
+      <circle cx="76" cy="38" r="6" fill="#00bbf9" stroke="#121820" stroke-width="2"/>
+      <circle cx="60" cy="28" r="5" fill="#00bbf9" stroke="#121820" stroke-width="2"/>
+      <path d="M36 74 Q22 98 30 110 M52 80 L50 112 M68 80 L70 112 M84 74 Q98 98 90 110" fill="none" stroke="#ffd166" stroke-width="6"/>
+      <circle cx="48" cy="54" r="6" fill="#121820"/><circle cx="72" cy="54" r="6" fill="#121820"/>
+      <path d="M52 66 L68 66" stroke-width="3"/>
+    </g>`,
+    bigfin_squid: `<g stroke="#121820" stroke-width="3.5">
+      <path d="M60 12 L88 46 L74 80 L46 80 L32 46 Z" fill="#4cc9f0"/>
+      <path d="M46 80 L36 112 M56 80 L54 112 M64 80 L66 112 M74 80 L84 112" stroke="#4361ee" stroke-width="4"/>
+      <circle cx="48" cy="54" r="7" fill="#fff"/><circle cx="72" cy="54" r="7" fill="#fff"/>
+      <circle cx="48" cy="54" r="3" fill="#121820"/><circle cx="72" cy="54" r="3" fill="#121820"/>
+    </g>`,
+    longarm: `<g stroke="#121820" stroke-width="3.5">
+      <ellipse cx="60" cy="44" rx="24" ry="26" fill="#b56576"/>
+      <path d="M40 64 Q10 86 16 112 M50 68 Q34 94 40 114 M70 68 Q86 94 80 114 M80 64 Q110 86 104 112" fill="none" stroke="#b56576" stroke-width="5"/>
+      <circle cx="50" cy="44" r="6" fill="#fff"/><circle cx="70" cy="44" r="6" fill="#fff"/>
+      <circle cx="50" cy="44" r="3" fill="#121820"/><circle cx="70" cy="44" r="3" fill="#121820"/>
+    </g>`,
+    vampire: `<g stroke="#121820" stroke-width="3.5">
+      <path d="M60 16 C30 20 22 60 28 90 L60 76 L92 90 C98 60 90 20 60 16 Z" fill="#6a040f"/>
+      <path d="M24 38 Q10 30 16 48 M96 38 Q110 30 104 48" fill="#9d0208"/>
+      <circle cx="48" cy="48" r="7" fill="#00f5d4"/><circle cx="72" cy="48" r="7" fill="#00f5d4"/>
+      <circle cx="48" cy="48" r="3" fill="#121820"/><circle cx="72" cy="48" r="3" fill="#121820"/>
+    </g>`,
+    humboldt: `<g stroke="#121820" stroke-width="3.5">
+      <polygon points="60,10 86,42 74,82 46,82 34,42" fill="#d90429"/>
+      <path d="M44 82 L30 112 M55 82 L50 112 M65 82 L70 112 M76 82 L90 112" stroke="#ef233c" stroke-width="5"/>
+      <circle cx="48" cy="52" r="7" fill="#ffca3a"/><circle cx="72" cy="52" r="7" fill="#ffca3a"/>
+      <path d="M44 44 L54 48 M76 44 L66 48" stroke-width="3"/>
+    </g>`,
+    gpo: `<g stroke="#121820" stroke-width="3.5">
+      <ellipse cx="60" cy="44" rx="38" ry="30" fill="#c9184a"/>
+      <path d="M28 66 Q12 94 22 114 M46 72 Q36 98 44 114 M74 72 Q84 98 76 114 M92 66 Q108 94 98 114" fill="none" stroke="#c9184a" stroke-width="7"/>
+      <circle cx="44" cy="46" r="8" fill="#fff"/><circle cx="76" cy="46" r="8" fill="#fff"/>
+      <circle cx="44" cy="46" r="4" fill="#121820"/><circle cx="76" cy="46" r="4" fill="#121820"/>
+    </g>`,
+    glass_squid: `<g stroke="#121820" stroke-width="3">
+      <ellipse cx="60" cy="48" rx="26" ry="34" fill="rgba(189,224,254,0.45)"/>
+      <ellipse cx="60" cy="50" rx="10" ry="18" fill="#ffafcc"/>
+      <path d="M46 80 L40 108 M60 82 L60 110 M74 80 L80 108" stroke="#a2d2ff" stroke-width="4"/>
+      <circle cx="48" cy="46" r="5" fill="#121820"/><circle cx="72" cy="46" r="5" fill="#121820"/>
+    </g>`,
+    blind_octo: `<g stroke="#121820" stroke-width="3.5">
+      <circle cx="60" cy="48" r="30" fill="#5e548e"/>
+      <path d="M36 72 Q22 96 30 110 M52 76 L48 110 M68 76 L72 110 M84 72 Q98 96 90 110" fill="none" stroke="#5e548e" stroke-width="5"/>
+      <path d="M42 46 L54 50 M78 46 L66 50" stroke="#e0b1cb" stroke-width="3"/>
+    </g>`,
+    architeuthis: `<g stroke="#121820" stroke-width="3.5">
+      <polygon points="60,8 92,40 76,82 44,82 28,40" fill="#7209b7"/>
+      <path d="M42 82 L18 114 M54 82 L46 114 M66 82 L74 114 M78 82 L102 114" stroke="#560bad" stroke-width="6"/>
+      <circle cx="46" cy="52" r="9" fill="#ffca3a"/><circle cx="74" cy="52" r="9" fill="#ffca3a"/>
+      <circle cx="46" cy="52" r="4" fill="#121820"/><circle cx="74" cy="52" r="4" fill="#121820"/>
+    </g>`,
+    colossal: `<g stroke="#121820" stroke-width="3.5">
+      <!-- 大王酸浆鱿：巨大肉鳍 + 旋转钩爪 -->
+      <polygon points="60,6 102,38 82,78 38,78 18,38" fill="#590d22"/>
+      <polygon points="60,18 82,42 70,74 50,74 38,42" fill="#a4133c"/>
+      <path d="M38 78 L14 112 L22 106 M52 78 L46 114 M68 78 L74 114 M82 78 L106 112 L98 106" fill="none" stroke="#800f2f" stroke-width="6"/>
+      <circle cx="44" cy="50" r="10" fill="#ffbe0b"/><circle cx="76" cy="50" r="10" fill="#ffbe0b"/>
+      <circle cx="44" cy="50" r="4" fill="#121820"/><circle cx="76" cy="50" r="4" fill="#121820"/>
+      <path d="M48 66 L60 72 L72 66" fill="none" stroke="#ffccd5" stroke-width="3"/>
+    </g>`
+  };
+  return svgWrap(map[id] || map.sepiella);
+}
+
+// 卡牌图标 SVG
+function getCardArtSVG(emoji, bg) {
+  return `<div style="font-size:38px;line-height:1;filter:drop-shadow(2px 2px 0 #121820);">${emoji}</div>`;
+}
+
+// ==================== 3. 卡牌数据库（全海洋生态：鱼/虾/蟹/虫/鸟/鲸/海豹/植物） ====================
+const CARD_DB = {
+  // 初始基础卡
+  krill: { id:'krill', name:'南极磷虾', cost:0, type:'bait', typeName:'饵料', emoji:'🦐', desc:'造成 3 点伤害，抽 1 张牌。可被【吞噬】。',
+    play(g){ g.damageEnemy(3); g.drawCards(1); } },
+  sandworm: { id:'sandworm', name:'沙蚕', cost:0, type:'bait', typeName:'虫群', emoji:'🪱', desc:'获得 3 点护甲，造成 2 点伤害。可被【吞噬】。',
+    play(g){ g.addPlayerBlock(3); g.damageEnemy(2); } },
+  hermit: { id:'hermit', name:'寄居蟹', cost:1, type:'shell', typeName:'甲壳', emoji:'🦀', desc:'获得 6 点护甲。',
+    play(g){ g.addPlayerBlock(6); } },
+  clownfish: { id:'clownfish', name:'小丑鱼', cost:1, type:'bait', typeName:'小鱼', emoji:'🐠', desc:'造成 5 点伤害。可被【吞噬】。',
+    play(g){ g.damageEnemy(5); } },
+
+  // 进阶卡牌
+  sea_roach: { id:'sea_roach', name:'海蟑螂', cost:0, type:'bait', typeName:'虫群', emoji:'🪲', desc:'造成 4 点伤害。可被【吞噬】。',
+    play(g){ g.damageEnemy(4); } },
+  barnacle: { id:'barnacle', name:'藤壶群', cost:0, type:'bait', typeName:'虫群', emoji:'🐚', desc:'获得 4 点护甲。可被【吞噬】。',
+    play(g){ g.addPlayerBlock(4); } },
+  sea_butterfly: { id:'sea_butterfly', name:'海蝴蝶', cost:0, type:'bait', typeName:'浮游', emoji:'🦋', desc:'下回合额外获得 1 点洋流。可被【吞噬】。',
+    play(g){ g.state.nextTurnEnergy += 1; } },
+
+  urchin: { id:'urchin', name:'紫海胆', cost:1, type:'shell', typeName:'甲壳', emoji:'🟣', desc:'获得 5 点护甲，获得 3 层【荆棘】反伤。',
+    play(g){ g.addPlayerBlock(5); g.state.player.thorns += 3; } },
+  king_crab: { id:'king_crab', name:'帝王蟹', cost:2, type:'shell', typeName:'甲壳', emoji:'🦀', desc:'获得 13 点护甲，造成 6 点伤害。',
+    play(g){ g.addPlayerBlock(13); g.damageEnemy(6); } },
+  lobster: { id:'lobster', name:'波士顿龙虾', cost:1, type:'shell', typeName:'甲壳', emoji:'🦞', desc:'造成 6 点伤害，获得 5 点护甲。',
+    play(g){ g.damageEnemy(6); g.addPlayerBlock(5); } },
+  turtle: { id:'turtle', name:'绿海龟', cost:2, type:'shell', typeName:'甲壳', emoji:'🐢', desc:'获得 15 点护甲，抽 1 张牌。',
+    play(g){ g.addPlayerBlock(15); g.drawCards(1); } },
+
+  shark: { id:'shark', name:'大白鲨', cost:2, type:'predator', typeName:'掠食者', emoji:'🦈', devour:true,
+    desc:'造成 14 点伤害。【吞噬】手牌1张饵料：伤害翻倍为 28！',
+    play(g, devoured){ g.damageEnemy(devoured ? 28 : 14); } },
+  orca: { id:'orca', name:'虎鲸', cost:3, type:'predator', typeName:'掠食者', emoji:'🐋', devour:true,
+    desc:'造成 20 点伤害。【吞噬】手牌1张饵料：费用-1且造成 34 伤害！',
+    play(g, devoured){ g.damageEnemy(devoured ? 34 : 20); } },
+  eel: { id:'eel', name:'电鳗', cost:1, type:'predator', typeName:'掠食者', emoji:'⚡',
+    desc:'造成 7 点伤害，施加 2 层【麻痹】（敌方攻击减25%）。',
+    play(g){ g.damageEnemy(7); g.state.enemy.shock += 2; } },
+  swordfish: { id:'swordfish', name:'剑鱼', cost:1, type:'predator', typeName:'掠食者', emoji:'🗡️',
+    desc:'无视敌方护甲，造成 9 点穿刺伤害。',
+    play(g){ g.damageEnemy(9, true); } },
+  sea_snake: { id:'sea_snake', name:'阔带青环海蛇', cost:1, type:'predator', typeName:'掠食者', emoji:'🐍',
+    desc:'造成 4 点伤害，施加 5 层【剧毒】。',
+    play(g){ g.damageEnemy(4); g.state.enemy.poison += 5; } },
+  puffer: { id:'puffer', name:'刺豚', cost:1, type:'predator', typeName:'鱼类', emoji:'🐡',
+    desc:'造成 5 点伤害，获得 4 层【荆棘】。',
+    play(g){ g.damageEnemy(5); g.state.player.thorns += 4; } },
+
+  seagull: { id:'seagull', name:'贼鸥', cost:1, type:'bird', typeName:'海鸟', emoji:'🕊️',
+    desc:'无视护甲造成 6 点伤害，偷取 8 金币，抽 1 张牌。',
+    play(g){ g.damageEnemy(6, true); g.state.gold += 8; g.drawCards(1); } },
+  albatross: { id:'albatross', name:'信天翁', cost:1, type:'bird', typeName:'海鸟', emoji:'🦅',
+    desc:'抽 3 张牌，本回合手牌费用不变。',
+    play(g){ g.drawCards(3); } },
+  penguin: { id:'penguin', name:'帝企鹅', cost:2, type:'bird', typeName:'海鸟', emoji:'🐧',
+    desc:'造成 10 点伤害，获得 8 点护甲，施加 1 层【麻痹】。',
+    play(g){ g.damageEnemy(10); g.addPlayerBlock(8); g.state.enemy.shock += 1; } },
+
+  dolphin: { id:'dolphin', name:'瓶鼻海豚', cost:1, type:'giant', typeName:'巨兽', emoji:'🐬',
+    desc:'抽 2 张牌，获得 1 点洋流。',
+    play(g){ g.drawCards(2); g.state.energy += 1; } },
+  whale: { id:'whale', name:'蓝鲸', cost:2, type:'giant', typeName:'巨兽', emoji:'🐳',
+    desc:'获得 14 点护甲，恢复 6 点生命。',
+    play(g){ g.addPlayerBlock(14); g.healPlayer(6); } },
+  seal: { id:'seal', name:'海豹', cost:1, type:'giant', typeName:'巨兽', emoji:'🦭',
+    desc:'造成 7 点伤害，获得 7 点护甲。',
+    play(g){ g.damageEnemy(7); g.addPlayerBlock(7); } },
+
+  kelp: { id:'kelp', name:'巨藻海带', cost:1, type:'plant', typeName:'海洋植物', emoji:'🌿',
+    desc:'获得 6 点护甲，施加 2 层【麻痹】，抽 1 张牌。',
+    play(g){ g.addPlayerBlock(6); g.state.enemy.shock += 2; g.drawCards(1); } },
+  coral: { id:'coral', name:'红珊瑚', cost:1, type:'plant', typeName:'海洋植物', emoji:'🪸',
+    desc:'获得 9 点护甲，恢复 3 点生命。',
+    play(g){ g.addPlayerBlock(9); g.healPlayer(3); } },
+  anemone: { id:'anemone', name:'荧光海葵', cost:0, type:'plant', typeName:'海洋植物', emoji:'🌺',
+    desc:'往手牌塞入 2 张 0 费【南极磷虾】。',
+    play(g){ g.addCardToHand('krill'); g.addCardToHand('krill'); } },
+  seagrass: { id:'seagrass', name:'海草床', cost:1, type:'plant', typeName:'海洋植物', emoji:'🌱',
+    desc:'恢复 5 点生命，抽 2 张牌。',
+    play(g){ g.healPlayer(5); g.drawCards(2); } }
+};
+
+// ==================== 4. 遗物系统 ====================
+const RELIC_DB = {
+  hook: { id:'hook', name:'生锈的鱼钩', icon:'🪝', desc:'每场战斗打出的第一张掠食者卡牌额外造成 6 点伤害。' },
+  pearl: { id:'pearl', name:'发光的珍珠', icon:'🫧', desc:'每当你打出一张海洋植物卡牌，恢复 3 点生命。' },
+  sonar: { id:'sonar', name:'破损的声呐', icon:'📡', desc:'每当你【吞噬】一张卡牌时，额外抽 1 张牌。' },
+  rum: { id:'rum', name:'沉船朗姆酒', icon:'🍾', desc:'每回合洋流上限 +1。' },
+  microplastic: { id:'microplastic', name:'塑料微粒', icon:'🧪', desc:'所有 0 费卡牌额外造成 3 点伤害。' },
+  vent: { id:'vent', name:'深海热泉石', icon:'🪨', desc:'每场战斗开始时，获得 8 点护甲。' },
+  tooth: { id:'tooth', name:'巨齿鲨牙', icon:'🦷', desc:'每次胜利后，最大生命值 +4。' }
+};
+
+// ==================== 5. 三幕头足类对手 ====================
+const ENEMY_DB = {
+  // Act 1
+  sepiella: { id:'sepiella', name:'曼氏无针乌贼', species:'Sepiella maindroni', hp:36, act:1,
+    intents:[{type:'atk',val:7,txt:'墨汁突刺 7'},{type:'blk',val:6,txt:'缩壳防御 6'},{type:'atk',val:9,txt:'触手抽打 9'}] },
+  short_octopus: { id:'short_octopus', name:'短蛸', species:'Amphioctopus fangsiao', hp:32, act:1,
+    intents:[{type:'atk',val:6,txt:'偷袭 6'},{type:'atk_blk',atk:5,blk:5,txt:'攻防一体 5+5'}] },
+  flamboyant: { id:'flamboyant', name:'火焰乌贼', species:'Metasepia pfefferi', hp:40, act:1,
+    intents:[{type:'atk',val:8,txt:'毒刺 8'},{type:'poison',val:3,txt:'释放毒素 3'}] },
+  nautilus: { id:'nautilus', name:'鹦鹉螺（精英）', species:'Nautilus pompilius', hp:56, act:1, elite:true,
+    intents:[{type:'blk',val:12,txt:'硬壳闭合 +12甲'},{type:'atk',val:11,txt:'螺壳撞击 11'}] },
+  blue_ring: { id:'blue_ring', name:'蓝环章鱼（Boss）', species:'Hapalochlaena', hp:78, act:1, boss:true,
+    intents:[{type:'atk',val:10,txt:'蓝环咬击 10'},{type:'poison',val:4,txt:'河豚毒素 4'},{type:'atk',val:14,txt:'剧毒连击 14'}] },
+
+  // Act 2
+  bigfin_squid: { id:'bigfin_squid', name:'莱氏拟乌贼', species:'Sepioteuthis lessoniana', hp:54, act:2,
+    intents:[{type:'atk',val:11,txt:'变色突袭 11'},{type:'blk',val:10,txt:'伪装闪避 +10甲'}] },
+  longarm: { id:'longarm', name:'长腕章鱼', species:'Octopus minor', hp:58, act:2,
+    intents:[{type:'atk',val:13,txt:'长腕鞭打 13'},{type:'atk_blk',atk:8,blk:8,txt:'缠绕防御 8+8'}] },
+  vampire: { id:'vampire', name:'吸血鬼乌贼', species:'Vampyroteuthis infernalis', hp:62, act:2,
+    intents:[{type:'atk',val:11,txt:'暗影噬咬 11'},{type:'heal',val:8,txt:'深海再生 +8血'}] },
+  humboldt: { id:'humboldt', name:'洪堡鱿鱼（精英）', species:'Dosidicus gigas', hp:82, act:2, elite:true,
+    intents:[{type:'atk',val:15,txt:'赤魔狂暴 15'},{type:'atk',val:18,txt:'锯齿吸盘 18'}] },
+  gpo: { id:'gpo', name:'北太平洋巨型章鱼（Boss）', species:'Enteroctopus dofleini', hp:115, act:2, boss:true,
+    intents:[{type:'atk',val:15,txt:'巨腕横扫 15'},{type:'blk',val:14,txt:'巨岩掩体 +14甲'},{type:'atk',val:20,txt:'深海绞杀 20'}] },
+
+  // Act 3
+  glass_squid: { id:'glass_squid', name:'玻璃乌贼', species:'Cranchiidae', hp:74, act:3,
+    intents:[{type:'blk',val:14,txt:'透明折射 +14甲'},{type:'atk',val:15,txt:'幽灵穿刺 15'}] },
+  blind_octo: { id:'blind_octo', name:'盲眼深海蛸', species:'Cirrothauma murrayi', hp:78, act:3,
+    intents:[{type:'atk',val:17,txt:'声波震击 17'},{type:'poison',val:5,txt:'深渊腐液 5'}] },
+  architeuthis: { id:'architeuthis', name:'大王乌贼（精英）', species:'Architeuthis dux', hp:110, act:3, elite:true,
+    intents:[{type:'atk',val:20,txt:'巨型触手 20'},{type:'atk_blk',atk:14,blk:12,txt:'深海壁垒 14+12'}] },
+  colossal: { id:'colossal', name:'大王酸浆鱿（最终BOSS）', species:'Mesonychoteuthis hamiltoni', hp:160, act:3, boss:true,
+    intents:[{type:'atk',val:18,txt:'旋转钩爪 18'},{type:'blk',val:16,txt:'极地寒流 +16甲'},{type:'atk',val:25,txt:'酸浆毁灭斩 25'},{type:'poison',val:6,txt:'深渊剧毒 6'}] }
+};
+
+// ==================== 6. 游戏核心状态机 ====================
+const Game = {
+  state: {
+    hp: 65, maxHp: 65, gold: 50, act: 1, nodeIdx: 0,
+    deck: [], relics: [], mapNodes: [],
+    energy: 3, maxEnergy: 3, nextTurnEnergy: 0,
+    drawPile: [], hand: [], discardPile: [],
+    player: { block: 0, thorns: 0, poison: 0 },
+    enemy: { data: null, hp: 0, maxHp: 0, block: 0, shock: 0, poison: 0, intentIdx: 0 },
+    firstPredatorUsed: false
+  },
+
+  init() {
+    document.getElementById('title-hero-art').innerHTML = `<div style="width:120px;height:120px;margin:0 auto;">${getPlayerSVG()}</div>`;
+  },
+
+  startNewRun() {
+    AudioSys.play('card');
+    this.state.hp = 65;
+    this.state.maxHp = 65;
+    this.state.gold = 50;
+    this.state.act = 1;
+    this.state.relics = ['hook'];
+    this.state.deck = [
+      'krill','krill','sandworm','hermit','hermit',
+      'clownfish','clownfish','shark','kelp','eel'
+    ];
+    this.buildActMap(1);
+    this.showScreen('map-screen');
+    this.renderTopbar();
+  },
+
+  buildActMap(act) {
+    this.state.act = act;
+    this.state.nodeIdx = 0;
+    const pool = Object.values(ENEMY_DB).filter(e => e.act === act && !e.elite && !e.boss);
+    const elite = Object.values(ENEMY_DB).find(e => e.act === act && e.elite);
+    const boss = Object.values(ENEMY_DB).find(e => e.act === act && e.boss);
+    const pick = () => pool[Math.floor(Math.random() * pool.length)];
+    this.state.mapNodes = [
+      { type:'battle', icon:'⚔️', label:'头足遭遇', enemy: pick().id },
+      { type:'battle', icon:'⚔️', label:'头足遭遇', enemy: pick().id },
+      { type:'shop', icon:'🐚', label:'沉船商店' },
+      { type:'elite', icon:'💀', label:'精英头足', enemy: elite.id },
+      { type:'rest', icon:'🪸', label:'珊瑚休息站' },
+      { type:'boss', icon:'👑', label: boss.name.split('（')[0], enemy: boss.id }
+    ];
+    this.renderMap();
+  },
+
+  renderMap() {
+    const names = {1:'第1幕：浅海珊瑚礁', 2:'第2幕：幽暗沉船区', 3:'第3幕：无光海沟'};
+    document.getElementById('map-act-title').textContent = names[this.state.act];
+    const wrap = document.getElementById('map-nodes');
+    wrap.innerHTML = '';
+    this.state.mapNodes.forEach((n, idx) => {
+      const div = document.createElement('div');
+      div.className = 'map-node' + (idx < this.state.nodeIdx ? ' done' : idx === this.state.nodeIdx ? ' current' : '');
+      div.innerHTML = `<div class="node-ico">${n.icon}</div><div class="node-lbl">${n.label}</div>`;
+      if (idx === this.state.nodeIdx) {
+        div.onclick = () => this.enterNode(n);
+      }
+      wrap.appendChild(div);
+    });
+  },
+
+  enterNode(node) {
+    AudioSys.play('card');
+    if (node.type === 'battle' || node.type === 'elite' || node.type === 'boss') {
+      this.startBattle(node.enemy);
+    } else if (node.type === 'rest') {
+      this.openRestModal();
+    } else if (node.type === 'shop') {
+      this.openShopModal();
+    }
+  },
+
+  startBattle(enemyId) {
+    const eData = ENEMY_DB[enemyId];
+    this.state.enemy = {
+      data: eData, hp: eData.hp, maxHp: eData.hp,
+      block: 0, shock: 0, poison: 0, intentIdx: 0
+    };
+    this.state.player = { block: this.hasRelic('vent') ? 8 : 0, thorns: 0, poison: 0 };
+    this.state.firstPredatorUsed = false;
+    this.state.nextTurnEnergy = 0;
+
+    this.state.drawPile = [...this.state.deck].sort(() => Math.random() - 0.5);
+    this.state.hand = [];
+    this.state.discardPile = [];
+
+    document.getElementById('player-art').innerHTML = getPlayerSVG();
+    document.getElementById('enemy-art').innerHTML = getEnemySVG(eData.id);
+    document.getElementById('enemy-name').textContent = eData.name;
+    document.getElementById('enemy-species').textContent = eData.species;
+
+    this.showScreen('battle-screen');
+    this.startPlayerTurn();
+  },
+
+  startPlayerTurn() {
+    this.state.maxEnergy = 3 + (this.hasRelic('rum') ? 1 : 0);
+    this.state.energy = this.state.maxEnergy + this.state.nextTurnEnergy;
+    this.state.nextTurnEnergy = 0;
+    this.state.player.block = 0;
+    this.drawCards(5);
+    this.log(`你的回合！抽了 5 张海洋卡牌。`);
+    this.renderBattle();
+  },
+
+  drawCards(n) {
+    for (let i = 0; i < n; i++) {
+      if (this.state.drawPile.length === 0) {
+        if (this.state.discardPile.length === 0) break;
+        this.state.drawPile = [...this.state.discardPile].sort(() => Math.random() - 0.5);
+        this.state.discardPile = [];
+      }
+      if (this.state.hand.length < 10) {
+        this.state.hand.push(this.state.drawPile.pop());
+      }
+    }
+  },
+
+  addCardToHand(cardId) {
+    if (this.state.hand.length < 10) this.state.hand.push(cardId);
+  },
+
+  hasRelic(id) { return this.state.relics.includes(id); },
+
+  playCard(handIdx) {
+    const cardId = this.state.hand[handIdx];
+    const card = CARD_DB[cardId];
+    // 检查吞噬：手牌里是否有其他 0~1 费饵料(bait)
+    let baitIdx = -1;
+    if (card.devour) {
+      baitIdx = this.state.hand.findIndex((id, i) => i !== handIdx && CARD_DB[id].type === 'bait');
+    }
+    let actualCost = card.cost;
+    if (card.id === 'orca' && baitIdx !== -1) actualCost = Math.max(0, card.cost - 1);
+
+    if (this.state.energy < actualCost) return;
+
+    this.state.energy -= actualCost;
+    this.state.hand.splice(handIdx, 1);
+    this.state.discardPile.push(cardId);
+
+    let devoured = false;
+    if (card.devour && baitIdx !== -1) {
+      // 因为上面 splice 了一个元素，重新找一次
+      const realBaitIdx = this.state.hand.findIndex(id => CARD_DB[id].type === 'bait');
+      if (realBaitIdx !== -1) {
+        const eatenId = this.state.hand.splice(realBaitIdx, 1)[0];
+        this.state.discardPile.push(eatenId);
+        devoured = true;
+        AudioSys.play('devour');
+        this.log(`🦈 【吞噬】吃掉了 ${CARD_DB[eatenId].name}！爆发威力！`);
+        if (this.hasRelic('sonar')) this.drawCards(1);
+      }
+    } else {
+      AudioSys.play('card');
+    }
+
+    // 遗物加成
+    if (card.type === 'plant' && this.hasRelic('pearl')) this.healPlayer(3);
+
+    card.play(this, devoured);
+
+    // 生锈鱼钩：第一张掠食者额外+6
+    if (card.type === 'predator' && !this.state.firstPredatorUsed && this.hasRelic('hook')) {
+      this.state.firstPredatorUsed = true;
+      this.damageEnemy(6);
+    }
+    // 塑料微粒：0费卡+3伤
+    if (card.cost === 0 && this.hasRelic('microplastic')) {
+      this.damageEnemy(3);
+    }
+
+    this.renderBattle();
+    this.checkBattleEnd();
+  },
+
+  damageEnemy(amount, ignoreBlock = false) {
+    const e = this.state.enemy;
+    let dmg = amount;
+    if (!ignoreBlock && e.block > 0) {
+      const absorbed = Math.min(e.block, dmg);
+      e.block -= absorbed;
+      dmg -= absorbed;
+    }
+    if (dmg > 0) {
+      e.hp = Math.max(0, e.hp - dmg);
+      AudioSys.play('hit');
+      const el = document.getElementById('enemy-art');
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+    }
+  },
+
+  damagePlayer(amount) {
+    const p = this.state.player;
+    let dmg = amount;
+    if (this.state.enemy.shock > 0) dmg = Math.floor(dmg * 0.75);
+    if (p.block > 0) {
+      const absorbed = Math.min(p.block, dmg);
+      p.block -= absorbed;
+      dmg -= absorbed;
+    }
+    if (dmg > 0) {
+      this.state.hp = Math.max(0, this.state.hp - dmg);
+      AudioSys.play('hit');
+      const el = document.getElementById('player-art');
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+    }
+    // 荆棘反伤
+    if (p.thorns > 0) {
+      this.damageEnemy(p.thorns);
+    }
+  },
+
+  addPlayerBlock(v) { this.state.player.block += v; },
+  healPlayer(v) { this.state.hp = Math.min(this.state.maxHp, this.state.hp + v); },
+
+  endPlayerTurn() {
+    // 弃掉剩余手牌
+    while (this.state.hand.length > 0) this.state.discardPile.push(this.state.hand.pop());
+
+    // 敌人中毒结算
+    const e = this.state.enemy;
+    if (e.poison > 0) {
+      e.hp = Math.max(0, e.hp - e.poison);
+      e.poison = Math.max(0, e.poison - 1);
+      if (this.checkBattleEnd()) return;
+    }
+
+    // 敌人行动
+    e.block = 0;
+    const intent = e.data.intents[e.intentIdx % e.data.intents.length];
+    if (intent.type === 'atk') this.damagePlayer(intent.val);
+    else if (intent.type === 'blk') e.block += intent.val;
+    else if (intent.type === 'atk_blk') { this.damagePlayer(intent.atk); e.block += intent.blk; }
+    else if (intent.type === 'poison') this.state.player.poison += intent.val;
+    else if (intent.type === 'heal') e.hp = Math.min(e.maxHp, e.hp + intent.val);
+
+    if (e.shock > 0) e.shock--;
+    e.intentIdx++;
+
+    // 玩家中毒结算
+    if (this.state.player.poison > 0) {
+      this.state.hp = Math.max(0, this.state.hp - this.state.player.poison);
+      this.state.player.poison = Math.max(0, this.state.player.poison - 1);
+    }
+
+    if (this.checkBattleEnd()) return;
+    this.startPlayerTurn();
+  },
+
+  checkBattleEnd() {
+    if (this.state.hp <= 0) {
+      this.openGameOverModal(false);
+      return true;
+    }
+    if (this.state.enemy.hp <= 0) {
+      AudioSys.play('win');
+      if (this.hasRelic('tooth')) { this.state.maxHp += 4; this.state.hp += 4; }
+      const isBoss = this.state.enemy.data.boss;
+      if (isBoss && this.state.act === 3) {
+        this.openGameOverModal(true);
+      } else {
+        this.openRewardModal(isBoss);
+      }
+      return true;
+    }
+    return false;
+  },
+
+  // ==================== 7. 渲染函数 ====================
+  renderTopbar() {
+    document.getElementById('ui-hp').textContent = `❤️ ${this.state.hp}/${this.state.maxHp}`;
+    document.getElementById('ui-gold').textContent = `🪙 ${this.state.gold}`;
+    const actNames = {1:'第1幕 · 浅海珊瑚礁', 2:'第2幕 · 幽暗沉船区', 3:'第3幕 · 无光海沟'};
+    document.getElementById('ui-act').textContent = `🌊 ${actNames[this.state.act]}`;
+    document.getElementById('ui-deck-count').textContent = this.state.deck.length;
+    const rb = document.getElementById('ui-relics');
+    rb.innerHTML = this.state.relics.map(id => {
+      const r = RELIC_DB[id];
+      return `<div class="relic-icon" data-tip="${r.name}：${r.desc}">${r.icon}</div>`;
+    }).join('');
+  },
+
+  renderBattle() {
+    this.renderTopbar();
+    const s = this.state;
+    document.getElementById('player-hp-bar').style.width = `${(s.hp / s.maxHp) * 100}%`;
+    document.getElementById('player-hp-text').textContent = `${s.hp} / ${s.maxHp}`;
+    document.getElementById('enemy-hp-bar').style.width = `${(s.enemy.hp / s.enemy.maxHp) * 100}%`;
+    document.getElementById('enemy-hp-text').textContent = `${s.enemy.hp} / ${s.enemy.maxHp}`;
+
+    const ps = [];
+    if (s.player.block > 0) ps.push(`<span class="badge badge-block">🛡️ 护甲 ${s.player.block}</span>`);
+    if (s.player.thorns > 0) ps.push(`<span class="badge badge-thorns">🌵 荆棘 ${s.player.thorns}</span>`);
+    if (s.player.poison > 0) ps.push(`<span class="badge badge-poison">☠️ 剧毒 ${s.player.poison}</span>`);
+    document.getElementById('player-status').innerHTML = ps.join('');
+
+    const es = [];
+    if (s.enemy.block > 0) es.push(`<span class="badge badge-block">🛡️ 护甲 ${s.enemy.block}</span>`);
+    if (s.enemy.shock > 0) es.push(`<span class="badge badge-shock">⚡ 麻痹 ${s.enemy.shock}</span>`);
+    if (s.enemy.poison > 0) es.push(`<span class="badge badge-poison">☠️ 剧毒 ${s.enemy.poison}</span>`);
+    document.getElementById('enemy-status').innerHTML = es.join('');
+
+    const intent = s.enemy.data.intents[s.enemy.intentIdx % s.enemy.data.intents.length];
+    document.getElementById('enemy-intent').textContent = `意图：${intent.txt}`;
+
+    document.getElementById('ui-energy').textContent = `⚡ 洋流 ${s.energy} / ${s.maxEnergy}`;
+    document.getElementById('ui-draw-pile').textContent = s.drawPile.length;
+    document.getElementById('ui-discard-pile').textContent = s.discardPile.length;
+
+    const handArea = document.getElementById('hand-area');
+    handArea.innerHTML = '';
+    const hasBait = s.hand.some(id => CARD_DB[id].type === 'bait');
+    s.hand.forEach((cid, idx) => {
+      const c = CARD_DB[cid];
+      let cost = c.cost;
+      const devourReady = c.devour && hasBait;
+      if (c.id === 'orca' && devourReady) cost = Math.max(0, c.cost - 1);
+      const canPlay = s.energy >= cost;
+      const el = document.createElement('div');
+      el.className = `card ${canPlay ? '' : 'unplayable'} ${devourReady ? 'devour-ready' : ''}`;
+      el.innerHTML = `
+        <div class="card-top">
+          <div class="card-cost">${cost}</div>
+          <div class="card-name">${c.name}</div>
+        </div>
+        <div class="card-art">${getCardArtSVG(c.emoji)}</div>
+        <div>
+          <span class="card-type type-${c.type}">${c.typeName}</span>
+          <div class="card-desc">${c.desc}</div>
+        </div>
+      `;
+      if (canPlay) el.onclick = () => this.playCard(idx);
+      handArea.appendChild(el);
+    });
+  },
+
+  log(msg) { document.getElementById('combat-log').textContent = msg; },
+
+  showScreen(id) {
+    ['title-screen', 'map-screen', 'battle-screen'].forEach(s => {
+      document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
+  },
+
+  // ==================== 8. 弹窗系统（奖励 / 商店 / 休息 / 牌库） ====================
+  openRewardModal(isBoss) {
+    const goldGain = isBoss ? 45 : 22;
+    this.state.gold += goldGain;
+    const allIds = Object.keys(CARD_DB);
+    const picks = [0,1,2].map(() => allIds[Math.floor(Math.random() * allIds.length)]);
+    let relicHtml = '';
+    if (isBoss) {
+      const avail = Object.keys(RELIC_DB).filter(id => !this.hasRelic(id));
+      if (avail.length > 0) {
+        const rid = avail[Math.floor(Math.random() * avail.length)];
+        this.state.relics.push(rid);
+        relicHtml = `<p style="color:var(--accent-gold);font-weight:800;">🎁 获得 Boss 遗物：${RELIC_DB[rid].icon} ${RELIC_DB[rid].name}！</p>`;
+      }
+    }
+    const mc = document.getElementById('modal-content');
+    mc.innerHTML = `
+      <h2 style="color:var(--accent-gold);margin:0 0 8px;">🎉 胜利！击败了 ${this.state.enemy.data.name}</h2>
+      <p>获得 <b>${goldGain} 金币</b>。选择 1 张新海洋卡牌加入牌库：</p>
+      ${relicHtml}
+      <div class="modal-cards" id="reward-cards"></div>
+      <button class="btn btn-coral" onclick="Game.finishNode(${isBoss})">跳过选牌，继续前进</button>
+    `;
+    const rc = document.getElementById('reward-cards');
+    picks.forEach(cid => {
+      const c = CARD_DB[cid];
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="card-top"><div class="card-cost">${c.cost}</div><div class="card-name">${c.name}</div></div>
+        <div class="card-art">${getCardArtSVG(c.emoji)}</div>
+        <div><span class="card-type type-${c.type}">${c.typeName}</span><div class="card-desc">${c.desc}</div></div>
+      `;
+      el.onclick = () => {
+        this.state.deck.push(cid);
+        this.finishNode(isBoss);
+      };
+      rc.appendChild(el);
+    });
+    document.getElementById('modal').classList.add('open');
+  },
+
+  finishNode(wasBoss) {
+    document.getElementById('modal').classList.remove('open');
+    if (wasBoss) {
+      this.buildActMap(this.state.act + 1);
+    } else {
+      this.state.nodeIdx++;
+      this.renderMap();
+    }
+    this.showScreen('map-screen');
+    this.renderTopbar();
+  },
+
+  openRestModal() {
+    const mc = document.getElementById('modal-content');
+    mc.innerHTML = `
+      <h2 style="color:var(--accent-teal);">🪸 珊瑚休息站</h2>
+      <p>在温暖的珊瑚丛中休整一下吧~</p>
+      <div style="display:flex;gap:14px;justify-content:center;margin:20px 0;">
+        <button class="btn btn-teal" onclick="Game.healPlayer(20);Game.finishNode(false);">❤️ 恢复 20 点生命</button>
+        <button class="btn btn-purple" onclick="Game.state.maxHp+=6;Game.healPlayer(6);Game.finishNode(false);">💪 最大生命 +6</button>
+      </div>
+    `;
+    document.getElementById('modal').classList.add('open');
+  },
+
+  openShopModal() {
+    const allIds = Object.keys(CARD_DB);
+    const items = [0,1,2].map(() => allIds[Math.floor(Math.random() * allIds.length)]);
+    const mc = document.getElementById('modal-content');
+    mc.innerHTML = `
+      <h2 style="color:var(--accent-gold);">🐚 沉船商店（当前金币：${this.state.gold}）</h2>
+      <div class="modal-cards" id="shop-cards"></div>
+      <button class="btn btn-coral" onclick="Game.finishNode(false)">离开商店</button>
+    `;
+    const sc = document.getElementById('shop-cards');
+    items.forEach(cid => {
+      const c = CARD_DB[cid];
+      const price = 25 + c.cost * 10;
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="card-top"><div class="card-cost">${c.cost}</div><div class="card-name">${c.name}</div></div>
+        <div class="card-art">${getCardArtSVG(c.emoji)}</div>
+        <div><span class="card-type type-${c.type}">${c.typeName}</span><div class="card-desc">${c.desc}</div></div>
+        <div style="background:#ffca3a;text-align:center;font-weight:900;border-radius:6px;padding:2px;margin-top:4px;">🪙 ${price}</div>
+      `;
+      el.onclick = () => {
+        if (this.state.gold >= price) {
+          this.state.gold -= price;
+          this.state.deck.push(cid);
+          el.style.opacity = '0.3';
+          el.onclick = null;
+          this.renderTopbar();
+        }
+      };
+      sc.appendChild(el);
+    });
+    document.getElementById('modal').classList.add('open');
+  },
+
+  openGameOverModal(win) {
+    const mc = document.getElementById('modal-content');
+    mc.innerHTML = win ? `
+      <h1 style="color:var(--accent-gold);">🏆 通关！深海霸主！</h1>
+      <p>拟态小章鱼·墨仔成功击败了<b>大王酸浆鱿</b>，成为了新的深海传奇！</p>
+      <button class="btn btn-teal" onclick="document.getElementById('modal').classList.remove('open');Game.startNewRun();">再来一局</button>
+    ` : `
+      <h1 style="color:var(--accent-coral);">💀 墨水耗尽…</h1>
+      <p>你在第 ${this.state.act} 幕倒下了，深海依然充满挑战。</p>
+      <button class="btn btn-teal" onclick="document.getElementById('modal').classList.remove('open');Game.startNewRun();">重新挑战</button>
+    `;
+    document.getElementById('modal').classList.add('open');
+  }
+};
+
+function openDeckModal() {
+  const mc = document.getElementById('modal-content');
+  mc.innerHTML = `
+    <h2 style="color:var(--accent-teal);">🃏 当前牌库（共 ${Game.state.deck.length} 张）</h2>
+    <div class="modal-cards" id="deck-view"></div>
+    <button class="btn" onclick="document.getElementById('modal').classList.remove('open')">关闭</button>
+  `;
+  const dv = document.getElementById('deck-view');
+  Game.state.deck.forEach(cid => {
+    const c = CARD_DB[cid];
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="card-top"><div class="card-cost">${c.cost}</div><div class="card-name">${c.name}</div></div>
+      <div class="card-art">${getCardArtSVG(c.emoji)}</div>
+      <div><span class="card-type type-${c.type}">${c.typeName}</span><div class="card-desc">${c.desc}</div></div>
+    `;
+    dv.appendChild(el);
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+Game.init();
+</script>
+</body>
+</html>
