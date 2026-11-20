@@ -160,6 +160,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   display:flex;flex-direction:column;
 }
 .card .art{position:absolute;inset:0;overflow:hidden;background:#08110f}
+.card .art img[hidden]{display:none}
 .card .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
 .card:hover .art img{transform:scale(1.07)}
 .card .fb{position:absolute;inset:0;display:grid;place-items:center;font-size:34px;
@@ -184,10 +185,35 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .card .txt .k{color:#8ef0d0;font-weight:900}
 .card.dead{filter:grayscale(.75) brightness(.62)}
 .card.dead:hover{transform:none;box-shadow:0 8px 20px rgba(0,0,0,.45)}
-.card.hot{border-color:#ff8b7b;box-shadow:0 0 0 2px rgba(255,139,123,.45),0 8px 22px rgba(0,0,0,.5)}
 .card:hover{transform:translateY(-22px) scale(1.26);z-index:70;border-color:#7ef0c9;
   box-shadow:0 26px 50px rgba(0,0,0,.62),0 0 0 2px rgba(126,240,201,.35)}
 .hand .card:hover{transform:translateY(-30px) scale(1.3)}
+/* 所有手牌共用同一个激活标记。 */
+.card .activation-mark{
+  position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5;
+  width:17px;height:17px;border-radius:50%;border:1px solid #bdc9c5;
+  background:rgba(8,20,17,.9);display:grid;place-items:center;
+}
+.card[data-activation="active"] .activation-mark{
+  border-color:#9bf5da;background:#163e35;box-shadow:0 0 7px rgba(155,245,218,.55);
+}
+.card[data-activation="active"] .activation-mark::after{
+  content:"";width:7px;height:7px;border-radius:50%;background:#c4ffed;
+}
+.hand .card[data-activation="active"]{
+  outline:1px solid rgba(155,245,218,.84);outline-offset:1px;
+  box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 11px rgba(155,245,218,.42);
+}
+.hand .card[data-activation="active"]::after{
+  border-color:rgba(155,245,218,.65);
+}
+.hand .card[data-activation="active"]:hover{
+  box-shadow:0 26px 50px rgba(0,0,0,.62),0 0 13px rgba(155,245,218,.5);
+}
+@media (prefers-reduced-motion:reduce){
+  .hand .card,.hand .card .art img{transition:none}
+}
+
 .r-common{border-color:#3a5e55}
 .r-uncommon{border-color:#4aa7c9;box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 14px rgba(120,220,255,.14)}
 .r-rare{border-color:#9b6fe0;box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 16px rgba(220,180,255,.22)}
@@ -261,9 +287,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="sub">DEEP SEA DECK</div>
     <p>深海头足类霸主们正在争夺领地。<br>选择你的章鱼，用整片海洋的卡牌组出属于你的流派。</p>
     <div class="tagrow">
-      <span>12 大流派</span><span>120+ 张卡牌</span><span>4 级稀有度</span><span>14 种头足类对手</span><span>角色专属技能</span>
+      <span>24 大流派</span><span>240 张卡牌</span><span>4 级稀有度</span><span>14 种头足类对手</span><span>角色专属技能</span>
     </div>
-    <div class="cta" style="margin-top:16px"><button class="btn ghost" onclick="UI.openCodex()">📖 卡牌图鉴（120 张）</button></div>
+    <div class="cta" style="margin-top:16px"><button class="btn ghost" onclick="UI.openCodex()">📖 卡牌图鉴（240 张）</button></div>
     <div class="chars" id="char-list"></div>
   </div>
 
@@ -385,14 +411,23 @@ function kwIn(text){
 
 /* ================= 卡牌库 ================= */
 const CARDS={};
-function def(id,n,cost,a,r,img,d,f){CARDS[id]={id,n,c:cost,a,r,img,d,f};}
+function def(id,n,cost,a,r,img,d,f,activates){
+  CARDS[id]={id,n,c:cost,a,r,img,d,f,activates};
+}
+
+const hasArmor=g=>g.s.p.block>0;
+const hasPoison=g=>g.s.e.poison>0;
+const hasShock=g=>g.s.e.shock>0;
+const isHighTide=g=>g.s.tide;
+const isLowTide=g=>!isHighTide(g);
+const hasBait=g=>g.hasBait();
 
 /* ---- 1 吞噬链 ---- */
 def('krill','南极磷虾',0,'devour','c','krill','造成 3 伤害，抽 1 张。【饵料】',g=>{g.hit(3);g.draw(1)});
 def('sandworm','沙蚕',0,'devour','c','sandworm','获得 3 护甲，造成 2 伤害。【饵料】',g=>{g.block(3);g.hit(2)});
 def('sardine','沙丁鱼群',1,'devour','c','sardine','造成 6 伤害。【饵料】',g=>{g.hit(6)});
 def('clownfish','小丑鱼',1,'devour','c','clownfish','造成 5 伤害，抽 1 张。【饵料】',g=>{g.hit(5);g.draw(1)});
-def('mackerel','大西洋鲭',1,'devour','u','mackerel','造成 8 伤害。若手牌有【饵料】，额外 3 伤害。',(g,c)=>{g.hit(8+(g.hasBait()?3:0))});
+def('mackerel','大西洋鲭',1,'devour','u','mackerel','造成 8 伤害。若手牌有【饵料】，额外 3 伤害。',(g,c)=>{g.hit(8+(hasBait(g)?3:0))},hasBait);
 def('shark','大白鲨',2,'devour','u','shark','造成 10 伤害。【吞噬】1 张饵料：改为 18 伤害。',(g,c)=>{g.hit(c.ate?18:10)});
 def('orca','虎鲸',3,'devour','r','orca','造成 15 伤害。【吞噬】：改为 24 伤害并获得 6 护甲。',(g,c)=>{g.hit(c.ate?24:15);if(c.ate)g.block(6)});
 def('barracuda','梭子鱼',1,'devour','u','barracuda','造成 7 伤害。【吞噬】：抽 2 张牌。',(g,c)=>{g.hit(7);if(c.ate)g.draw(2)});
@@ -406,7 +441,7 @@ def('urchin','紫海胆',1,'shell','c','urchin','获得 5 护甲，获得 3 层�
 def('lobster','波士顿龙虾',1,'shell','c','lobster','造成 6 伤害，获得 5 护甲。',g=>{g.hit(6);g.block(5)});
 def('kingcrab','帝王蟹',2,'shell','u','kingcrab','获得 13 护甲，造成 6 伤害。',g=>{g.block(13);g.hit(6)});
 def('turtle','绿海龟',2,'shell','u','turtle','获得 15 护甲，抽 1 张牌。',g=>{g.block(15);g.draw(1)});
-def('crab','黄道蟹',1,'shell','u','crab','获得 8 护甲。若本回合未受伤，再获得 5 护甲。',g=>{g.block(8+(g.s.p.block>0?5:0))});
+def('crab','黄道蟹',1,'shell','u','crab','获得 8 护甲。若本回合未受伤，再获得 5 护甲。',g=>{g.block(8+(hasArmor(g)?5:0))},hasArmor);
 def('horseshoe','鲎',2,'shell','r','horseshoe','获得 12 护甲，回合结束护甲不清空。',g=>{g.block(12);g.s.keepBlock=true});
 def('giantclam','巨砗磲',3,'shell','r','giantclam','获得 20 护甲，获得 6 层荆棘。',g=>{g.block(20);g.thr(6)});
 def('abalone','鲍鱼',1,'shell','u','abalone','获得 7 护甲，抽 1 张牌。',g=>{g.block(7);g.draw(1)});
@@ -420,8 +455,8 @@ def('stonefish','石头鱼',2,'venom','u','stonefish','造成 8 伤害，施加 
 def('cone','芋螺',1,'venom','u','conesnail','施加 3 层剧毒，抽 1 张牌。',g=>{g.psn(3);g.draw(1)});
 def('manowar','僧帽水母',2,'venom','u','manowar','施加 7 层剧毒，获得 6 护甲。',g=>{g.psn(7);g.block(6)});
 def('boxjelly','箱水母',2,'venom','r','boxjelly','施加 12 层剧毒。',g=>g.psn(12));
-def('blueringcard','蓝环之触',3,'venom','r','bluering','施加 9 层剧毒；若敌人已有剧毒，改为 18 层。',g=>{g.psn(g.s.e.poison>0?18:9)});
-def('toxicbloom','毒素爆发',1,'venom','r','anemone','立即结算一次敌方剧毒伤害（不减少层数）。',g=>{g.hit(g.s.e.poison,true);g.log('毒素爆发！')});
+def('blueringcard','蓝环之触',3,'venom','r','bluering','施加 9 层剧毒；若敌人已有剧毒，改为 18 层。',g=>{g.psn(hasPoison(g)?18:9)},hasPoison);
+def('toxicbloom','毒素爆发',1,'venom','r','anemone','立即结算一次敌方剧毒伤害（不减少层数）。',g=>{g.hit(g.s.e.poison,true);g.log('毒素爆发！')},hasPoison);
 
 /* ---- 4 洋流 ---- */
 def('flyingfish','飞鱼',0,'current','c','flyingfish','造成 3 伤害，下回合 +1 洋流。',g=>{g.hit(3);g.s.nextEnergy+=1});
@@ -511,10 +546,10 @@ def('symbiowing','共生之环',3,'symbio','l','anemone','成长层数翻倍，�
 def('tidepool','潮池',0,'tide','c','limpet','获得 4 护甲。',g=>g.block(4));
 def('sanddollar','沙钱',1,'tide','c','sandle','造成 5 伤害，获得 5 护甲。',g=>{g.hit(5);g.block(5)});
 def('moonsnail','玉螺',1,'tide','c','moonsnail','造成 7 伤害。',g=>g.hit(7));
-def('grunion','加州滑银汉鱼',0,'tide','u','grunion','涨潮时造成 9 伤害。',g=>{g.hit(g.s.tide?9:4)});
+def('grunion','加州滑银汉鱼',0,'tide','u','grunion','涨潮时造成 9 伤害。',g=>{g.hit(isHighTide(g)?9:4)},isHighTide);
 def('tidecall','唤潮',1,'tide','u','moonjelly','切换潮汐状态；涨潮时抽 2 张牌。',g=>{g.s.tide=!g.s.tide;if(g.s.tide)g.draw(2);g.log(g.s.tide?'涨潮！':'退潮…')});
-def('surf','浪涌',2,'tide','u','manta','造成 9 伤害，若是涨潮则翻倍。',g=>{g.hit(g.s.tide?18:9)});
-def('lowtide','退潮护壳',2,'tide','u','turtle','获得 12 护甲，若是退潮则改为 20。',g=>{g.block(g.s.tide?12:20)});
+def('surf','浪涌',2,'tide','u','manta','造成 9 伤害，若是涨潮则翻倍。',g=>{g.hit(isHighTide(g)?18:9)},isHighTide);
+def('lowtide','退潮护壳',2,'tide','u','turtle','获得 12 护甲，若是退潮则改为 20。',g=>{g.block(isLowTide(g)?20:12)},isLowTide);
 def('tsunami','海啸',3,'tide','r','whaleshark','造成 20 伤害，切换潮汐。',g=>{g.hit(20);g.s.tide=!g.s.tide});
 def('tidefull','满潮',2,'tide','r','flyingfish','立即进入涨潮，获得 2 点洋流。',g=>{g.s.tide=true;g.gain(2)});
 def('tideheart','潮心',3,'tide','l','seasnake','本场每次涨潮，额外造成 6 点伤害。',g=>{g.s.tideBonus=(g.s.tideBonus||0)+6;g.log('潮心共鸣')});
@@ -523,13 +558,13 @@ def('tideheart','潮心',3,'tide','l','seasnake','本场每次涨潮，额外造
 def('static','静电',0,'volt','c','eel','施加 1 层麻痹。',g=>g.shk(1));
 def('electricray','电鳐',1,'volt','c','electricray','造成 6 伤害，施加 1 层麻痹。',g=>{g.hit(6);g.shk(1)});
 def('eel2','电鳗',1,'volt','u','eel','造成 7 伤害，施加 2 层麻痹。',g=>{g.hit(7);g.shk(2)});
-def('stargazer','瞻星鱼',1,'volt','u','stargazer','造成 5 伤害，每层麻痹额外 +2 伤害。',g=>{g.hit(5+2*g.s.e.shock)});
+def('stargazer','瞻星鱼',1,'volt','u','stargazer','造成 5 伤害，每层麻痹额外 +2 伤害。',g=>{g.hit(5+2*g.s.e.shock)},hasShock);
 def('voltchain','电链',2,'volt','u','electriccatfish','造成 4×麻痹层数 的伤害。',g=>{g.hit(4*Math.max(1,g.s.e.shock))});
 def('shockwave','冲击波',2,'volt','u','boxjelly','施加 3 层麻痹，抽 1 张牌。',g=>{g.shk(3);g.draw(1)});
 def('paralyze','瘫痪',2,'volt','r','stargazer','敌人下回合伤害减半（叠加）。',g=>{g.s.paralyze=(g.s.paralyze||0)+50;g.log('敌人瘫痪了')});
 def('thunder','雷暴',3,'volt','r','electriccatfish','造成 10 伤害，施加 4 层麻痹。',g=>{g.hit(10);g.shk(4)});
 def('voltcore','电核',2,'volt','r','electricray','本场每层麻痹使你的攻击 +1 伤害。',g=>{g.s.voltPower=true;g.log('电核充能')});
-def('storm','深海风暴',3,'volt','l','stargazer','造成 8×麻痹层数 的伤害，然后清空麻痹。',g=>{g.hit(8*Math.max(1,g.s.e.shock));g.s.e.shock=0});
+def('storm','深海风暴',3,'volt','l','stargazer','造成 8×麻痹层数 的伤害，然后清空麻痹。',g=>{g.hit(8*Math.max(1,g.s.e.shock));g.s.e.shock=0},hasShock);
 
 /* ================= 遗物 ================= */
 const RELICS={
@@ -651,49 +686,62 @@ const Game={
     s.turnNo=0;
     s.skillCd=0;
     if(this.hasRelic('ink')) s.e.shock+=3;
-    s.drawPile=shuffle([...s.deck]); s.hand=[]; s.discard=[];
+    this.initPoolFight();
+    s.drawPile=shuffle(s.deck.map(id=>this.newToken(id))); s.hand=[]; s.discard=[];
     s.inBattle=true;
     UI.show('scr-battle');
     this.startTurn();
   },
 
-  startTurn(){
+  async startTurn(){
     const s=this.s;
-    s.turnNo++;
-    s.maxEnergy=3+(this.hasRelic('rum')?1:0)+(s.ch.skill.type==='passive'?1:0);
-    s.energy=s.maxEnergy+s.nextEnergy;
-    s.nextEnergy=0;
-    if(!s.keepBlock) s.p.block=0;
-    if(this.hasRelic('shell')) s.p.block+=3;
-    if(s.growthBlock && s.buffs.growth>0) s.p.block+=s.buffs.growth*2;
-    s.costDown=0;
-    this.draw(5);
-    UI.log('回合 '+s.turnNo+' · 洋流 '+s.energy);
-    UI.battle(); UI.top();
+    this.turnStarting=true;
+    try{
+      s.turnNo++;
+      s.maxEnergy=3+(this.hasRelic('rum')?1:0)+(s.ch.skill.type==='passive'?1:0);
+      s.energy=s.maxEnergy+s.nextEnergy;
+      s.nextEnergy=0;
+      s.p.block=s.turnNo===1?s.p.block:s.keepBlock?Math.min(8,s.p.block):0;
+      s.keepBlock=false;
+      if(this.hasRelic('shell')) s.p.block+=3;
+      if(s.turnNo>1) s.p.block+=s.buffs.growth;
+      s.costDown=0;
+      await this.tickPool();
+      if(this.checkEnd()) return;
+      const draws=5+s.extraDraw;
+      s.extraDraw=0;
+      this.draw(draws);
+      UI.log('回合 '+s.turnNo+' · 洋流 '+s.energy);
+      UI.battle(); UI.top();
+    } finally {
+      this.turnStarting=false;
+    }
   },
 
   draw(n){
     const s=this.s;
-    for(let i=0;i<n;i++){
+    for(let i=0;i<n&&s.hand.length<10;i++){
       if(!s.drawPile.length){
         if(!s.discard.length) break;
         s.drawPile=shuffle(s.discard); s.discard=[];
-        if(this.hasRelic('lens')) { if(s.hand.length<10) s.hand.push(s.drawPile.pop()); }
+        if(this.hasRelic('lens')) s.hand.push(s.drawPile.pop());
       }
-      if(s.hand.length<10) s.hand.push(s.drawPile.pop());
+      if(s.hand.length<10&&s.drawPile.length) s.hand.push(s.drawPile.pop());
     }
   },
 
   /* --- 效果助手（供卡牌调用） --- */
-  hasBait(){ return this.s.hand.some(id=>id==='krill'||id==='sandworm'||id==='sardine'||id==='clownfish'); },
-  hit(n,pierce){
-    const s=this.s,e=s.e;
-    let d=Math.round(n*(1+e.vuln*0.25));
-    if(s.voltPower) d+=e.shock;
-    if(!pierce&&e.block>0){const a=Math.min(e.block,d);e.block-=a;d-=a;}
-    if(d>0){e.hp=Math.max(0,e.hp-d);Audio.hit();UI.shake('e-art');}
+  hasBait(){ return this.s.hand.some(id=>CARDS[id].baitBonus&&!CARDS[id].temporary); },
+
+  handCardState(card,id=card.token){
+    const eligible=this.s.hand.some(token=>token!==id&&!CARDS[token].temporary);
+    const canDevour=Boolean(card.devours&&eligible);
+    const cost=Math.max(0,(card.free?0:card.c)-(this.s.costDown>0?1:0)-Number(this.s.discounts.has(id)));
+    const ctx={id,card,cost,paid:false};
+    const conditional=Boolean(card.devours||card.activates);
+    const active=canDevour||Boolean(card.activates?.(this,ctx));
+    return {cost,canDevour,conditional,active};
   },
-  block(n){ this.s.p.block+=n; },
   heal(n){ const s=this.s; s.hp=Math.min(s.maxHp,s.hp+n); if(n>0)Audio.heal(); },
   gain(n){ this.s.energy+=n; },
   psn(n){ this.s.e.poison+=n; },
@@ -701,31 +749,12 @@ const Game={
   frz(n){ this.s.e.freeze+=n; },
   vln(n){ this.s.e.vuln+=n; },
   thr(n){ this.s.p.thorns+=n; },
-  buff(k,n){ const b=this.s.buffs; b[k]=(b[k]||0)+n; return b[k]; },
   log(t){ UI.log(t); },
 
   addHand(id,n){ n=n||1; const s=this.s; for(let i=0;i<n;i++) if(s.hand.length<10) s.hand.push(id); },
-  mimicHand(free){
-    const s=this.s;
-    if(!s.hand.length) return;
-    const id=s.hand[(Math.random()*s.hand.length)|0];
-    if(s.hand.length<10){ s.hand.push(id); UI.log('复制了 '+CARDS[id].n); }
-  },
-  mimicZero(){
-    const s=this.s;
-    const zeros=[...new Set(s.hand.filter(id=>CARDS[id].c===0))];
-    zeros.forEach(id=>{ if(s.hand.length<10) s.hand.push(id); });
-    if(zeros.length) UI.log('拟态：复制了 '+zeros.length+' 张 0 费牌');
-  },
-  replayLast(n){
-    const s=this.s, cnt=n||1;
-    const last=s.lastPlayed.slice(-cnt);
-    last.forEach(id=>{ if(s.hand.length<10) s.hand.push(id); });
-    if(last.length) UI.log('回响：'+last.map(i=>CARDS[i].n).join('、'));
-  },
   recall(){
     const s=this.s;
-    if(!s.discard.length) return;
+    if(!s.discard.length||s.hand.length>=10) return;
     const i=(Math.random()*s.discard.length)|0;
     const id=s.discard.splice(i,1)[0];
     if(s.hand.length<10) s.hand.push(id);
@@ -735,54 +764,73 @@ const Game={
   hasRelic(id){ return this.s.relics.includes(id); },
 
   /* --- 出牌 --- */
-  playCard(handIdx){
-    const s=this.s, id=s.hand[handIdx];
+  async playCard(handIdx){
+    const s=this.s;
+    if(!s.inBattle||s.resolving||this.turnStarting) return;
+    const id=s.hand[handIdx];
     if(!id) return;
     const card=CARDS[id];
-    let cost=Math.max(0,card.c-(s.costDown>0?1:0));
-    const isBait=['krill','sandworm','sardine','clownfish'].includes(id);
-    const canDevour=card.a==='devour'&&card.c>=2&&this.hasBait()&&!isBait;
-    if(canDevour&&id==='orca') cost=Math.max(0,cost-1);
+    const {cost,canDevour}=this.handCardState(card,id);
     if(s.energy<cost) return;
 
-    if(this.hasRelic('pearl2')&&s.turnNo>0&&!s._playedThisTurn){ s._playedThisTurn=true; s.energy+=1; }
-    s.energy-=cost;
-    if(s.costDown>0) s.costDown--;
-    s.hand.splice(handIdx,1);
-    s.discard.push(id);
-
-    let ate=false;
-    if(canDevour){
-      const bi=s.hand.findIndex(x=>['krill','sandworm','sardine','clownfish'].includes(x));
-      if(bi>=0){
-        const eaten=s.hand.splice(bi,1)[0];
-        s.discard.push(eaten);
-        ate=true; s.ateCount++;
-        Audio.eat();
-        UI.log('🦈 吞噬 '+CARDS[eaten].n+' → 爆发！');
-        if(this.hasRelic('sonar')) this.draw(1);
-        if(this.hasRelic('fang')) this.hit(5,true);
-      } else Audio.card();
-    } else Audio.card();
-
-    if(card.a==='symbio'&&this.hasRelic('pearl')) this.heal(3);
-
-    card.f(this,{ate});
-    s.lastPlayed.push(id);
-    if(s.lastPlayed.length>6) s.lastPlayed.shift();
-
-    if(card.a==='devour'&&!s.playedPredator&&this.hasRelic('hook')){
-      s.playedPredator=true; this.hit(6);
+    const ctx={id,card,cost,paid:true,ate:false,hidden:s.hidden.has(id),attack:false,defense:false};
+    s.resolving=ctx;
+    try{
+      if(this.hasRelic('pearl2')&&!s._playedThisTurn){s._playedThisTurn=true;s.energy++;}
+      s.energy-=cost;
+      if(s.costDown>0) s.costDown--;
+      s.hand.splice(handIdx,1);
+      s.hidden.delete(id);
+      s.discounts.delete(id);
+      if(s.retain===id) s.retain=null;
+      if(canDevour){
+        const choices=s.hand.filter(token=>!CARDS[token].temporary);
+        const eaten=await this.pickCard('吞噬一张手牌',choices);
+        if(eaten){
+          s.hand.splice(s.hand.indexOf(eaten),1);
+          s.hidden.delete(eaten);
+          if(s.retain===eaten) s.retain=null;
+          s.discard.push(eaten);
+          ctx.ate=true;
+          Audio.eat();
+          UI.log('🦈 吞噬 '+CARDS[eaten].n);
+          ctx.passive=true;
+          CARDS[eaten].baitBonus?.(this);
+          if(this.hasRelic('sonar')&&s.e.hp>0) this.draw(1);
+          if(this.hasRelic('fang')) this.hit(5,true);
+          ctx.passive=false;
+        }
+      }
+      if(!ctx.ate) Audio.card();
+      if(s.e.hp>0){
+        if(card.a==='symbio'&&this.hasRelic('pearl')) this.heal(3);
+        await card.f(this,ctx);
+      }
+      s.attacked||=ctx.attack;
+      s.defended||=ctx.defense;
+      s.usedHidden||=ctx.hidden;
+      if(!card.temporary){
+        if(!s.sealed.has(id)) s.discard.push(id);
+        s.lastPlayed.push(id);
+        if(s.lastPlayed.length>6) s.lastPlayed.shift();
+      }
+      ctx.passive=true;
+      if(card.devours&&!s.playedPredator&&this.hasRelic('hook')&&s.e.hp>0){
+        s.playedPredator=true;
+        this.hit(6);
+      }
+      if(card.c===0&&this.hasRelic('plastic')) this.hit(3);
+    } finally {
+      s.resolving=null;
     }
-    if(card.c===0&&this.hasRelic('plastic')) this.hit(3);
-
-    UI.battle(); UI.top();
-    this.checkEnd();
+    if(!this.checkEnd()){UI.battle();UI.top();}
+    else UI.top();
   },
 
   /* --- 技能 --- */
   useSkill(){
     const s=this.s, sk=s.ch.skill;
+    if(!s.inBattle||s.resolving||this.turnStarting) return;
     if(sk.type==='passive'){ UI.log('被动技能始终生效'); return; }
     if(s.skillCd>0){ UI.log('技能冷却中（'+s.skillCd+'）'); return; }
     Audio.skill();
@@ -791,19 +839,13 @@ const Game={
     s.skillCd=sk.cd;
     UI.battle();
   },
-  mimicHandWithZero(){
-    const s=this.s;
-    if(!s.hand.length){ UI.log('手牌为空，技能无法发动'); return; }
-    const id=s.hand[(Math.random()*s.hand.length)|0];
-    if(s.hand.length<10) s.hand.push(id);
-    UI.log('拟态复制：'+CARDS[id].n);
-  },
-
   /* --- 回合结束 --- */
   endTurn(){
     const s=this.s;
-    while(s.hand.length) s.discard.push(s.hand.pop());
+    if(!s.inBattle||s.resolving||this.turnStarting) return;
+    this.finishPoolTurn();
     s._playedThisTurn=false;
+    if(this.checkEnd()) return;
 
     if(s.e.poison>0){
       s.e.hp=Math.max(0,s.e.hp-s.e.poison);
@@ -824,8 +866,8 @@ const Game={
       else if(it.k==='psn'){ s.p.poison+=it.v; msg=it.t+' +'+it.v; }
       else if(it.k==='heal'){ s.e.hp=Math.min(s.e.maxHp,s.e.hp+it.v); msg=it.t+' +'+it.v; }
       UI.log('对手：'+msg);
-      s.e.i++;
     }
+    s.e.i++;
     s.skipEnemy=false;
     if(s.e.shock>0) s.e.shock--;
     if(s.e.vuln>0) s.e.vuln--;
@@ -843,7 +885,7 @@ const Game={
     let mult=1;
     if(s.e.shock>0) mult-=0.25;
     if(s.fog) mult-=s.fog/100;
-    if(s.paralyze) mult-=s.paralyze/100;
+    if(s.paralyze){mult*=0.5;s.paralyze=0;}
     if(s.frozenHalf) mult*=0.5;
     let d=Math.round(base*Math.max(0.15,mult));
     if(s.e.freeze>0) d=Math.max(0,d-2*s.e.freeze);
@@ -855,7 +897,7 @@ const Game={
 
   checkEnd(){
     const s=this.s;
-    if(s.hp<=0){ this.gameOver(false); return true; }
+    if(s.hp<=0){ s.inBattle=false; this.gameOver(false); return true; }
     if(s.e.hp<=0){
       Audio.win();
       if(this.hasRelic('tooth')){ s.maxHp+=4; s.hp+=4; }
@@ -1058,17 +1100,18 @@ const UI={
     const el=document.createElement('div');
     const rc={c:'r-common',u:'r-uncommon',r:'r-rare',l:'r-legend'}[c.r];
     el.className='card '+rc+(opts.fixed?' fixed':'');
-    el.dataset.card=id;
+    el.dataset.card=c.id;
+    if(c.species) el.dataset.species=c.species;
     el.innerHTML=`
       <div class="art">
-        <img src="img/${c.img}.jpg" alt="" onerror="this.style.display='none';this.parentNode.querySelector('.fb').style.display='grid'">
-        <div class="fb" style="display:none">🐟</div>
+        ${c.img?`<img src="img/${c.img}.jpg" alt="" onerror="this.hidden=true;this.nextElementSibling.style.display='grid'">`:''}
+        <div class="fb" style="display:${c.img?'none':'grid'}">🐟</div>
       </div>
       <div class="grad"></div>
       <div class="cost">${c.c}</div>
       <div class="gem"></div>
       <div class="panel">
-        <div class="nm">${c.n}</div>
+        <div class="nm" title="${c.species||c.n}">${c.n}</div>
         <div class="txt">${kwMark(c.d)}</div>
       </div>`;
     el.addEventListener('mouseenter',()=>UI.showKW(el,c));
@@ -1093,10 +1136,15 @@ const UI={
     if(s.p.block>0) ps.push('<span class="st blk">🛡 '+s.p.block+'</span>');
     if(s.p.thorns>0) ps.push('<span class="st thr">🌵 '+s.p.thorns+'</span>');
     if(s.p.poison>0) ps.push('<span class="st psn">☠ '+s.p.poison+'</span>');
+    if(s.buffs.echo>0) ps.push('<span class="st buff">回声 '+s.buffs.echo+'</span>');
+    for(const item of s.delayed){
+      const label={dive:'潜航',vent:'喷口',retain:'留牌'}[item.kind];
+      ps.push('<span class="st buff">'+label+' · 第 '+item.turn+' 轮</span>');
+    }
     if(s.buffs.swarm>0) ps.push('<span class="st buff">🐛 虫群 '+s.buffs.swarm+'</span>');
     if(s.buffs.glow>0) ps.push('<span class="st buff">✨ 发光 '+s.buffs.glow+'</span>');
     if(s.buffs.growth>0) ps.push('<span class="st buff">🌱 成长 '+s.buffs.growth+'</span>');
-    if(s.tide) ps.push('<span class="st shk">🌊 涨潮</span>');
+    ps.push('<span class="st shk">🌊 '+(s.tide?'涨潮':'退潮')+'</span>');
     document.getElementById('p-status').innerHTML=ps.join('');
 
     const es=[];
@@ -1124,16 +1172,19 @@ const UI={
 
     const hand=document.getElementById('hand');
     hand.innerHTML='';
-    const bait=Game.hasBait();
     s.hand.forEach((id,i)=>{
-      const c=CARDS[id];
-      let cost=Math.max(0,c.c-(s.costDown>0?1:0));
-      const isBait=['krill','sandworm','sardine','clownfish'].includes(id);
-      const canDev=c.a==='devour'&&c.c>=2&&bait&&!isBait;
-      if(canDev&&id==='orca') cost=Math.max(0,cost-1);
+      const {cost,conditional,active}=Game.handCardState(CARDS[id],id);
       const el=this.cardEl(id);
+      const mark=document.createElement('span');
+      const label=active?'已激活':conditional?'未激活':'无激活条件';
+      el.dataset.activation=active?'active':'inactive';
       el.querySelector('.cost').textContent=cost;
-      if(canDev) el.classList.add('hot');
+      mark.className='activation-mark';
+      if(s.hidden.has(id)) el.querySelector('.nm').title+=' · 伏藏';
+      mark.title=label;
+      mark.setAttribute('role','img');
+      mark.setAttribute('aria-label',label);
+      el.appendChild(mark);
       if(s.energy<cost) el.classList.add('dead');
       else el.onclick=()=>Game.playCard(i);
       hand.appendChild(el);
@@ -1166,6 +1217,7 @@ const UI={
   hideKW(){ document.getElementById('kwpanel').classList.remove('on'); },
 
   openCodex(){
+    if(Game.uiChoice) return;
     this._cxArch='all'; this._cxRar='all';
     const n=Object.keys(CARDS).length;
     this.sheet(`
@@ -1194,6 +1246,7 @@ const UI={
     }).forEach(id=>list.appendChild(this.cardEl(id,{fixed:true})));
   },
   openDeck(){
+    if(Game.uiChoice) return;
     const s=Game.s; if(!s) return;
     const aff=Game.affinity();
     const total=s.deck.length||1;
@@ -1214,5 +1267,6 @@ const UI={
 
 UI.title();
 </script>
+<script src="card-pool.js"></script>
 </body>
 </html>
