@@ -1,0 +1,523 @@
+/* ============================================================
+   《墨水与触手 · 深海牌局》成品级前端视觉与交互样式 (ui-polish.css)
+   ============================================================ */
+
+:root {
+  --act-bg-1: radial-gradient(1200px 620px at 50% -10%, #1d4d42 0%, transparent 62%),
+              radial-gradient(900px 540px at 88% 105%, #113832 0%, transparent 58%),
+              linear-gradient(180deg, #091c18, #071614 60%, #05110f);
+  --act-bg-2: radial-gradient(1200px 620px at 50% -10%, #19304d 0%, transparent 62%),
+              radial-gradient(900px 540px at 88% 105%, #16213e 0%, transparent 58%),
+              linear-gradient(180deg, #091322, #070f1c 60%, #050a14);
+  --act-bg-3: radial-gradient(1200px 620px at 50% -10%, #2d1942 0%, transparent 62%),
+              radial-gradient(900px 540px at 88% 105%, #1a0d2e 0%, transparent 58%),
+              linear-gradient(180deg, #0d0816, #090612 60%, #05030b);
+  --glass: rgba(14, 36, 31, 0.78);
+  --glass-strong: rgba(9, 25, 22, 0.92);
+  --border-glow: rgba(94, 234, 212, 0.34);
+}
+
+body {
+  background: var(--act-bg-1);
+  transition: background 0.8s ease;
+  min-height: 100vh;
+}
+body[data-act="2"] { background: var(--act-bg-2); }
+body[data-act="3"] { background: var(--act-bg-3); }
+
+/* 动态深海 Canvas 背景层 */
+#ocean-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.72;
+}
+body.reduced-fx #ocean-canvas { display: none; }
+
+/* 受击暗角警示 */
+#damage-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 150;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 52%, rgba(255, 65, 85, 0.55) 100%);
+  transition: opacity 0.14s ease-out;
+}
+#damage-vignette.flash { opacity: 1; }
+
+/* 顶栏精致玻璃质感 */
+.topbar {
+  background: linear-gradient(180deg, rgba(20, 50, 44, 0.88), rgba(11, 29, 25, 0.92));
+  border: 1.5px solid rgba(94, 234, 212, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 9px 14px;
+}
+.pill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 标题页升级 */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(18, 46, 40, 0.9), rgba(9, 24, 21, 0.95));
+  border: 1.5px solid rgba(94, 234, 212, 0.28);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto -20%;
+  height: 240px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(94, 234, 212, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.hero .art {
+  animation: floatSlow 4.2s ease-in-out infinite;
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.stats-strip {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 14px auto 4px;
+  font-size: 12px;
+  color: #8fbfae;
+}
+.stats-strip span {
+  background: rgba(8, 22, 19, 0.7);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.stats-strip b { color: var(--gold); }
+
+/* 角色选择卡升级 */
+.charpick {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(22, 54, 47, 0.92), rgba(10, 26, 22, 0.96));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.charpick::after {
+  content: "点击出航 →";
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--teal);
+  opacity: 0.78;
+  transition: transform 0.16s, opacity 0.16s;
+}
+.charpick:hover::after {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+/* 航路地图升级 */
+.mapbox {
+  background: linear-gradient(180deg, rgba(16, 42, 36, 0.9), rgba(9, 23, 20, 0.95));
+  border: 1.5px solid rgba(94, 234, 212, 0.26);
+  position: relative;
+}
+.depth-meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(8, 20, 17, 0.65);
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  font-size: 12px;
+}
+.depth-step {
+  flex: 1;
+  text-align: center;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #7ea89a;
+  font-weight: 700;
+}
+.depth-step.active {
+  background: rgba(94, 234, 212, 0.18);
+  color: var(--mint);
+  border: 1px solid rgba(94, 234, 212, 0.4);
+}
+.depth-step.passed {
+  color: var(--teal);
+  opacity: 0.75;
+}
+.track {
+  position: relative;
+  align-items: center;
+  gap: 12px;
+}
+.node {
+  position: relative;
+  z-index: 1;
+}
+.node.current {
+  animation: pulseNode 2s ease-in-out infinite;
+}
+@keyframes pulseNode {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.16), 0 10px 24px rgba(94, 234, 212, 0.16); }
+  50% { box-shadow: 0 0 0 7px rgba(94, 234, 212, 0.28), 0 14px 30px rgba(94, 234, 212, 0.26); }
+}
+.node[data-kind="boss"] { border-color: rgba(255, 139, 123, 0.45); }
+.node.current[data-kind="boss"] {
+  border-color: var(--coral);
+  background: linear-gradient(180deg, rgba(255, 139, 123, 0.24), rgba(20, 10, 14, 0.88));
+}
+
+/* 战斗舞台升级 */
+.arena {
+  background: linear-gradient(180deg, rgba(18, 46, 40, 0.76), rgba(9, 23, 20, 0.92));
+  border: 1.5px solid rgba(94, 234, 212, 0.26);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: visible;
+}
+.fighter { position: relative; }
+.portrait {
+  width: 128px;
+  height: 128px;
+  transition: transform 0.18s ease, box-shadow 0.2s ease;
+}
+.portrait.flash-white::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  animation: hitFlash 0.24s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes hitFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.portrait.shield-glow {
+  box-shadow: 0 0 0 3px rgba(120, 220, 255, 0.5), 0 0 24px rgba(120, 220, 255, 0.45);
+}
+
+/* 敌人意图徽章升级 */
+.intent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+  transition: transform 0.2s;
+}
+.intent.intent-atk { border-color: #ff8b7b; color: #ffd0c9; background: rgba(65, 18, 22, 0.88); }
+.intent.intent-blk { border-color: #78dcff; color: #c7f0ff; background: rgba(14, 38, 56, 0.88); }
+.intent.intent-psn { border-color: #b4ffb4; color: #d8ffd8; background: rgba(18, 46, 26, 0.88); }
+.intent.intent-heal { border-color: #6ee7b7; color: #ccfbf1; background: rgba(14, 48, 38, 0.88); }
+.intent.intent-mix { border-color: #fbbf24; color: #fef08a; background: rgba(54, 38, 12, 0.88); }
+.intent .dmg-cut { color: #78dcff; font-weight: 900; margin-left: 2px; }
+.intent .dmg-old { text-decoration: line-through; opacity: 0.55; margin-right: 3px; }
+
+/* 状态标签带 Tooltip */
+.st {
+  cursor: help;
+  position: relative;
+  transition: transform 0.14s;
+}
+.st:hover { transform: translateY(-1px); }
+
+/* 飘字战斗数值 */
+.float-num {
+  position: fixed;
+  z-index: 260;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 22px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9), 0 0 2px #000;
+  animation: floatUp 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  white-space: nowrap;
+}
+.float-num.dmg { color: #ff7a70; font-size: 25px; }
+.float-num.crit { color: #fef08a; font-size: 29px; }
+.float-num.blk { color: #78dcff; font-size: 21px; }
+.float-num.heal { color: #6ee7b7; font-size: 22px; }
+.float-num.psn { color: #b4ffb4; font-size: 20px; }
+.float-num.buff { color: #dcb4ff; font-size: 18px; }
+@keyframes floatUp {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.75); }
+  18%  { opacity: 1; transform: translate(-50%, -12px) scale(1.12); }
+  100% { opacity: 0; transform: translate(-50%, -58px) scale(0.92); }
+}
+
+/* 回合横幅 */
+#turn-banner {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%) scale(0.92);
+  z-index: 240;
+  pointer-events: none;
+  opacity: 0;
+  padding: 12px 44px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(10, 32, 28, 0.94) 18%, rgba(16, 48, 42, 0.96) 50%, rgba(10, 32, 28, 0.94) 82%, transparent);
+  border-top: 1.5px solid rgba(94, 234, 212, 0.55);
+  border-bottom: 1.5px solid rgba(94, 234, 212, 0.55);
+  color: var(--cream);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 14px rgba(94, 234, 212, 0.45);
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+#turn-banner.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* 能量晶球与底栏控制 */
+.bar {
+  background: rgba(12, 32, 27, 0.72);
+  border: 1.5px solid rgba(94, 234, 212, 0.22);
+  border-radius: 18px;
+  padding: 8px 14px;
+  backdrop-filter: blur(8px);
+}
+.energy {
+  position: relative;
+  padding: 7px 16px 7px 12px;
+  background: radial-gradient(circle at 22% 50%, rgba(94, 234, 212, 0.34), rgba(10, 30, 26, 0.9) 68%);
+  box-shadow: 0 0 18px rgba(94, 234, 212, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.energy.low {
+  opacity: 0.65;
+  border-color: #46665d;
+  box-shadow: none;
+}
+.pile-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pile-btn {
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  background: rgba(8, 22, 19, 0.78);
+  color: #a7d9ca;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.14s;
+  font-family: inherit;
+}
+.pile-btn:hover {
+  border-color: var(--teal);
+  color: var(--cream);
+  transform: translateY(-1px);
+}
+.pile-btn b { color: var(--cream); }
+
+/* 扇形手牌排布（桌面端） */
+.hand {
+  min-height: 248px;
+  padding: 18px 8px 14px;
+  align-items: flex-end;
+}
+@media (min-width: 760px) {
+  .hand.fan-layout {
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+  .hand.fan-layout .card {
+    margin-left: -18px;
+    transform: translateY(var(--fan-y, 0px)) rotate(var(--fan-rot, 0deg));
+    transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2), margin 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .hand.fan-layout .card:first-child { margin-left: 0; }
+  .hand.fan-layout .card:hover {
+    transform: translateY(-38px) scale(1.28) rotate(0deg) !important;
+    margin-left: 10px;
+    margin-right: 26px;
+    z-index: 90;
+  }
+  .hand.fan-layout .card.dead:hover {
+    transform: translateY(-14px) scale(1.06) rotate(0deg) !important;
+    z-index: 80;
+  }
+}
+
+/* 快捷键角标 */
+.card .hotkey {
+  position: absolute;
+  top: 34px;
+  left: 7px;
+  z-index: 5;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: rgba(6, 18, 15, 0.82);
+  border: 1px solid rgba(167, 243, 208, 0.35);
+  color: #9dc9bb;
+  font-size: 10px;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+/* 流派生态无图精致卡面（替代默认鱼 emoji） */
+.card .fb.styled-fb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 24px;
+  gap: 6px;
+  background:
+    radial-gradient(circle at 50% 26%, var(--arch-glow, rgba(94,234,212,0.34)) 0%, transparent 62%),
+    linear-gradient(160deg, var(--arch-bg, #15352e) 0%, #071512 78%);
+}
+.card .fb.styled-fb .fb-ico {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.55));
+}
+.card .fb.styled-fb .fb-arch {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(6, 18, 15, 0.65);
+  border: 1px solid var(--arch-color, #5eead4);
+  color: var(--arch-color, #5eead4);
+}
+.card .fb.styled-fb .fb-sp {
+  font-size: 9px;
+  font-style: italic;
+  color: rgba(204, 251, 241, 0.52);
+  max-width: 126px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 传说卡流光 */
+.card.r-legend::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(120deg, transparent 42%, rgba(254, 240, 138, 0.24) 50%, transparent 58%);
+  transform: translateX(-100%);
+  animation: legendShimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+@keyframes legendShimmer {
+  0%, 65% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 战报历史抽屉 */
+#log-drawer {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: 320px;
+  z-index: 120;
+  background: rgba(8, 22, 19, 0.95);
+  border: 1.5px solid rgba(94, 234, 212, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+#log-drawer.open { display: flex; }
+#log-drawer .ld-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 13px;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.2);
+  font-size: 12.5px;
+  font-weight: 900;
+  color: var(--mint);
+}
+#log-drawer .ld-body {
+  padding: 8px 12px;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #b4d8cc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#log-drawer .ld-item {
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+#log-drawer .ld-item .ld-t {
+  color: #6f9c8c;
+  font-size: 10.5px;
+  margin-right: 6px;
+  font-weight: 800;
+}
+
+/* 图鉴搜索与筛选升级 */
+.codex-search-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.codex-input {
+  width: min(320px, 100%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #2f5a4e;
+  background: rgba(8, 22, 19, 0.9);
+  color: var(--cream);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.codex-input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.16);
+}
+.kbd-hint {
+  text-align: center;
+  font-size: 11px;
+  color: #6b9688;
+  margin-top: 6px;
+}
+.kbd-hint kbd {
+  background: rgba(11, 29, 25, 0.85);
+  border: 1px solid #305a4e;
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: #a7d9ca;
+  font-family: inherit;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .art, .node.current, .card.r-legend::before { animation: none !important; }
+  #ocean-canvas { display: none; }
+}
