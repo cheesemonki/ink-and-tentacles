@@ -1,8 +1,14 @@
-# 墨水与触手：深海牌局 (Ink & Tentacles)
+# 墨水与触手 · 深海牌局 (Ink & Tentacles)
 
-以海洋生物与头足类对决为主题的纯前端单文件卡牌构筑 Roguelike 游戏。
+一款以海洋生物与头足类对决为主题的**单文件网页卡牌构筑 Roguelike**。
 
-- 主角：拟态小章鱼 · 墨仔 (*Thaumoctopus mimicus*)
-- 对手：14 种真实物种头足类动物，最终 BOSS 为大王酸浆鱿 (*Mesonychoteuthis hamiltoni*)
-- 卡牌：全海洋生态（鱼、虾、蟹、虫、海鸟、鲸、海豹、海洋植物），支持食物链【吞噬】机制
-- 零依赖、纯原生 HTML + SVG + WebAudio
+## 玩法
+- 你是**拟态小章鱼 · 墨仔**（*Thaumoctopus mimicus*）
+- 三幕爬塔：浅海珊瑚礁 → 幽暗沉船区 → 无光海沟
+- 14 种真实物种头足类对手，终局 BOSS 为**大王酸浆鱿**（*Mesonychoteuthis hamiltoni*）
+- 27 种海洋卡牌：饵料、甲壳、掠食者、海鸟、巨兽、海洋植物
+- 核心机制【**吞噬**】：打出大白鲨/虎鲸时，吃掉手牌里的饵料，换来伤害翻倍或费用减免
+- 7 种遗物改变规则
+
+## 技术
+纯 HTML + CSS + 原生 JS，零依赖。卡牌与角色图片取自 Wikimedia Commons（CC 许可）。
