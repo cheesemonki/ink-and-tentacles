@@ -163,8 +163,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .card .art img[hidden]{display:none}
 .card .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
 .card:hover .art img{transform:scale(1.07)}
-.card .fb{position:absolute;inset:0;display:grid;place-items:center;font-size:34px;
+.card .fb{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:6px;font-size:30px;
   background:linear-gradient(135deg,#1d4238,#0b1d19)}
+.card .fb small{color:#b5d8cc;font-size:11px;font-weight:700}
 .card .grad{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(5,14,12,.6) 0%,rgba(5,14,12,0) 22%),
              linear-gradient(0deg,rgba(5,14,12,.97) 30%,rgba(5,14,12,.82) 46%,rgba(5,14,12,0) 68%)}
@@ -382,9 +383,9 @@ const RAR={c:{n:'普通',w:60},u:{n:'精良',w:26},r:{n:'稀有',w:11},l:{n:'传
 const KW={
  '护甲':'护甲：抵挡伤害。回合开始时通常清零（少数卡牌/遗物可保留）。',
  '荆棘':'荆棘：每当被攻击，对攻击者造成等同层数的伤害。',
- '麻痹':'麻痹：敌人攻击伤害 -25%（有层数即生效），回合结束减 1 层。',
+ '麻痹':'麻痹：敌人攻击伤害 -50%（有层数即生效），回合结束减 1 层。',
  '剧毒':'剧毒：敌人回合结束时受到等同层数的伤害，然后减 1 层。',
- '易伤':'易伤：受到的伤害 +25%/层，回合结束减 1 层。',
+ '易伤':'易伤：受到的伤害 +5%/层，回合结束减 1 层。',
  '冻结':'冻结：敌人每次攻击额外 -2 伤害/层，回合结束减 1 层。',
  '洋流':'洋流：打出卡牌所需能量，每回合恢复到上限。',
  '吞噬':'吞噬：打出该牌时自动吃掉手牌中 1 张【饵料】以触发强化。',
@@ -648,8 +649,8 @@ const Game={
       p:{block:0,thorns:0,poison:0},
       e:{def:null,hp:0,maxHp:0,block:0,shock:0,poison:0,freeze:0,vuln:0,i:0},
       buffs:{swarm:0,glow:0,growth:0},
-      ateCount:0, keepBlock:false, costDown:0, fog:0, skipEnemy:false,
-      tide:false, paralyze:0, voltPower:false, frozenHalf:false,
+      ateCount:0, keepBlock:false, costDown:0, fog:0, skipEnemy:0,
+      tide:false, paralyze:0, voltPower:0, frozenHalf:0,
       growthBlock:false, tideBonus:0, skillCd:0, playedPredator:false,
       lastPlayed:[], turnNo:0, inBattle:false
     };
@@ -680,8 +681,8 @@ const Game={
     s.e={def,hp:def.hp,maxHp:def.hp,block:0,shock:0,poison:0,freeze:0,vuln:0,i:0};
     s.p={block:this.hasRelic('vent')?8:0,thorns:0,poison:0};
     s.buffs={swarm:0,glow:0,growth:0};
-    s.ateCount=0; s.keepBlock=false; s.costDown=0; s.fog=0; s.skipEnemy=false;
-    s.tide=false; s.paralyze=0; s.voltPower=false; s.frozenHalf=false;
+    s.ateCount=0; s.keepBlock=false; s.costDown=0; s.fog=0; s.skipEnemy=0;
+    s.tide=false; s.paralyze=0; s.voltPower=0; s.frozenHalf=0;
     s.growthBlock=false; s.tideBonus=0; s.playedPredator=false; s.lastPlayed=[];
     s.turnNo=0;
     s.skillCd=0;
@@ -701,7 +702,7 @@ const Game={
       s.maxEnergy=3+(this.hasRelic('rum')?1:0)+(s.ch.skill.type==='passive'?1:0);
       s.energy=s.maxEnergy+s.nextEnergy;
       s.nextEnergy=0;
-      s.p.block=s.turnNo===1?s.p.block:s.keepBlock?Math.min(8,s.p.block):0;
+      s.p.block=s.turnNo===1?s.p.block:s.keepBlock?s.p.block:0;
       s.keepBlock=false;
       if(this.hasRelic('shell')) s.p.block+=3;
       if(s.turnNo>1) s.p.block+=s.buffs.growth;
@@ -736,7 +737,7 @@ const Game={
   handCardState(card,id=card.token){
     const eligible=this.s.hand.some(token=>token!==id&&!CARDS[token].temporary);
     const canDevour=Boolean(card.devours&&eligible);
-    const cost=Math.max(0,(card.free?0:card.c)-(this.s.costDown>0?1:0)-Number(this.s.discounts.has(id)));
+    const cost=Math.max(0,(card.free?0:card.c)-(this.s.costDown>0?1:0)-(this.s.discounts.get(id)||0));
     const ctx={id,card,cost,paid:false};
     const conditional=Boolean(card.devours||card.activates);
     const active=canDevour||Boolean(card.activates?.(this,ctx));
@@ -782,14 +783,14 @@ const Game={
       s.hand.splice(handIdx,1);
       s.hidden.delete(id);
       s.discounts.delete(id);
-      if(s.retain===id) s.retain=null;
+      s.retain.delete(id);
       if(canDevour){
         const choices=s.hand.filter(token=>!CARDS[token].temporary);
         const eaten=await this.pickCard('吞噬一张手牌',choices);
         if(eaten){
           s.hand.splice(s.hand.indexOf(eaten),1);
           s.hidden.delete(eaten);
-          if(s.retain===eaten) s.retain=null;
+          s.retain.delete(eaten);
           s.discard.push(eaten);
           ctx.ate=true;
           Audio.eat();
@@ -856,6 +857,7 @@ const Game={
 
     s.e.block=0;
     if(s.skipEnemy){
+      s.skipEnemy--;
       UI.log('对手被冻结，无法行动');
     } else {
       const it=s.e.def.it[s.e.i%s.e.def.it.length];
@@ -868,7 +870,6 @@ const Game={
       UI.log('对手：'+msg);
     }
     s.e.i++;
-    s.skipEnemy=false;
     if(s.e.shock>0) s.e.shock--;
     if(s.e.vuln>0) s.e.vuln--;
     if(s.e.freeze>0) s.e.freeze--;
@@ -882,12 +883,9 @@ const Game={
 
   hurtPlayer(base){
     const s=this.s;
-    let mult=1;
-    if(s.e.shock>0) mult-=0.25;
-    if(s.fog) mult-=s.fog/100;
-    if(s.paralyze){mult*=0.5;s.paralyze=0;}
-    if(s.frozenHalf) mult*=0.5;
-    let d=Math.round(base*Math.max(0.15,mult));
+    const halves=Number(s.e.shock>0)+s.fog+s.paralyze+s.frozenHalf;
+    s.paralyze=0;
+    let d=Math.round(base*.5**halves);
     if(s.e.freeze>0) d=Math.max(0,d-2*s.e.freeze);
     let dd=d;
     if(s.p.block>0){ const a=Math.min(s.p.block,dd); s.p.block-=a; dd-=a; }
@@ -1105,7 +1103,7 @@ const UI={
     el.innerHTML=`
       <div class="art">
         ${c.img?`<img src="img/${c.img}.jpg" alt="" onerror="this.hidden=true;this.nextElementSibling.style.display='grid'">`:''}
-        <div class="fb" style="display:${c.img?'none':'grid'}">🐟</div>
+        <div class="fb" style="display:${c.img?'none':'grid'}"><span aria-hidden="true">🐟</span><small>暂无卡图</small></div>
       </div>
       <div class="grad"></div>
       <div class="cost">${c.c}</div>
@@ -1136,6 +1134,7 @@ const UI={
     if(s.p.block>0) ps.push('<span class="st blk">🛡 '+s.p.block+'</span>');
     if(s.p.thorns>0) ps.push('<span class="st thr">🌵 '+s.p.thorns+'</span>');
     if(s.p.poison>0) ps.push('<span class="st psn">☠ '+s.p.poison+'</span>');
+    if(s.voltPower>0) ps.push('<span class="st buff">电核 '+s.voltPower+'</span>');
     if(s.buffs.echo>0) ps.push('<span class="st buff">回声 '+s.buffs.echo+'</span>');
     for(const item of s.delayed){
       const label={dive:'潜航',vent:'喷口',retain:'留牌'}[item.kind];
@@ -1148,6 +1147,9 @@ const UI={
     document.getElementById('p-status').innerHTML=ps.join('');
 
     const es=[];
+    if(s.fog+s.frozenHalf>0) es.push('<span class="st buff">减伤 '+(s.fog+s.frozenHalf)+' 层</span>');
+    if(s.paralyze>0) es.push('<span class="st shk">瘫痪 '+s.paralyze+'</span>');
+    if(s.skipEnemy>0) es.push('<span class="st shk">封冻 '+s.skipEnemy+'</span>');
     if(e.block>0) es.push('<span class="st blk">🛡 '+e.block+'</span>');
     if(e.shock>0) es.push('<span class="st shk">⚡ '+e.shock+'</span>');
     if(e.poison>0) es.push('<span class="st psn">☠ '+e.poison+'</span>');
@@ -1222,7 +1224,7 @@ const UI={
     const n=Object.keys(CARDS).length;
     this.sheet(`
       <h2>📖 卡牌图鉴 <span style="font-size:12.5px;color:#8fbfae;font-weight:600">共 ${n} 张</span></h2>
-      <p class="lead">鼠标移到卡牌上可查看关键词说明</p>
+      <p class="lead">鼠标移到卡牌上可查看关键词说明 · <a href="artwork.html" target="_blank" rel="noopener" style="color:var(--mint)">卡图来源</a></p>
       <div class="filters" id="cx-arch"></div>
       <div class="filters" id="cx-rar"></div>
       <div class="picks" id="cx-list"></div>
@@ -1267,6 +1269,6 @@ const UI={
 
 UI.title();
 </script>
-<script src="card-pool.js"></script>
+<script src="card-pool.js?v=2"></script>
 </body>
 </html>

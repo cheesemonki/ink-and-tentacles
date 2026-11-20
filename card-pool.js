@@ -6,10 +6,9 @@ const CardPool = (() => {
   const remove=(pile,id)=>pile.splice(pile.indexOf(id),1)[0];
   const armored=g=>g.s.e.block>0;
   const below=(g,n)=>g.s.hp*100<=g.s.maxHp*n;
-  const peril=g=>below(g,40);
-  const full=g=>g.s.e.hp*100>=g.s.e.maxHp*75;
-  const harvest=g=>g.s.e.hp*100<=g.s.e.maxHp*30;
-  const middle=g=>!full(g)&&!harvest(g);
+  const peril=g=>below(g,50);
+  const full=g=>g.s.e.hp*2>g.s.e.maxHp;
+  const harvest=g=>g.s.e.hp*2<=g.s.e.maxHp;
   const shielded=g=>g.s.defended;
   const attacked=g=>g.s.attacked;
   const flanked=g=>attacked(g)&&shielded(g);
@@ -24,18 +23,18 @@ const CardPool = (() => {
   const stocked=(g,c)=>hand(g,c).length>0;
   const vented=g=>g.s.vented;
   const dived=g=>g.s.dived;
-  const freeVent=g=>g.s.delayed.filter(item=>item.kind==='vent').length<2;
   const pendingVent=g=>g.s.delayed.filter(item=>item.kind==='vent').sort((a,b)=>a.turn-b.turn)[0];
   const canRetime=g=>pendingVent(g)?.turn>g.s.turnNo+1;
-  const canDive=(g,c)=>!g.s.diveQueued&&(c.paid?g.s.energy:g.s.energy-c.cost)>=1;
-  const canSeal=(g,c)=>g.s.deck.length-g.s.sealed.size>4&&stocked(g,c);
-  const selfSeal=(g,c)=>real(c.id)&&g.s.deck.length-g.s.sealed.size>4;
+  const canDive=(g,c)=>(c.paid?g.s.energy:g.s.energy-c.cost)>=1;
+  const canSeal=(g,c)=>g.s.deck.length-g.s.sealed.size>1&&stocked(g,c);
+  const selfSeal=(g,c)=>real(c.id)&&g.s.deck.length-g.s.sealed.size>1;
   const retainHigh=(g,c)=>hand(g,c,card=>card.c>=2).length>0;
-  const retainDiscount=(g,c)=>hand(g,c,card=>g.s.hidden.has(card.token)&&!g.s.discounts.has(card.token)&&card.c>0).length>0;
+  const discountable=(g,card)=>g.s.hidden.has(card.token)&&(g.s.discounts.get(card.token)||0)<card.c;
+  const retainDiscount=(g,c)=>hand(g,c,card=>discountable(g,card)).length>0;
   const afterDefense=g=>g.s.usedHidden;
   const leaky=g=>g.s.paidLife;
   const pain=n=>g=>g.s.hp>n;
-  const cross=(g,c,damage)=>!harvest(g)&&g.previewDamage(damage)>=g.s.e.hp-Math.floor(g.s.e.maxHp*0.3)&&g.previewDamage(damage)<g.s.e.hp;
+  const cross=(g,c,damage)=>!harvest(g)&&g.previewDamage(damage)>=g.s.e.hp-Math.floor(g.s.e.maxHp/2)&&g.previewDamage(damage)<g.s.e.hp;
   const hasEchoFour=g=>g.s.buffs.echo>=3;
   const highTop=g=>Boolean(top(g)&&CARDS[top(g)].c>=2);
 
@@ -55,7 +54,7 @@ const CardPool = (() => {
     };
   }
   const choose=(predicate,yes,no=()=>{})=>(g,c)=>predicate(g,c)?yes(g,c):no(g,c);
-  function takeEcho(g,n){const amount=Math.min(g.s.buffs.echo,n);g.buff('echo',-amount);return amount;}
+  function takeEcho(g){const amount=g.s.buffs.echo;g.buff('echo',-amount);return amount;}
   const strip=(g,n)=>{
     const enemy=g.s.e,removed=Math.min(n,enemy.block);
     enemy.block-=removed;
@@ -67,7 +66,7 @@ const CardPool = (() => {
     if(!id) return false;
     remove(g.s.hand,id);
     g.s.hidden.delete(id);
-    if(g.s.retain===id) g.s.retain=null;
+    g.s.retain.delete(id);
     move(id);
     return true;
   }
@@ -102,7 +101,7 @@ const CardPool = (() => {
   }
   async function retain(g,c,filter){
     const id=await g.pickCard('选择留到下回合的牌',hand(g,c,filter));
-    if(id) g.s.retain=id;
+    if(id) g.s.retain.add(id);
     return Boolean(id);
   }
   function schedule(g,kind,after,effect){
@@ -111,24 +110,23 @@ const CardPool = (() => {
   const dive=effect=>async(g,c)=>{
     if(canDive(g,c)&&await g.confirmEffect('额外支付 1 洋流，发动潜航？')){
       g.s.energy--;
-      g.s.diveQueued=true;
       schedule(g,'dive',1,effect);
     }
   };
-  const vent=(after,effect)=>g=>{if(freeVent(g)) schedule(g,'vent',after,effect);};
+  const vent=(after,effect)=>g=>schedule(g,'vent',after,effect);
   const payLife=n=>async g=>{
     if(!pain(n)(g)||!await g.confirmEffect(`失去 ${n} 生命，触发额外效果？`)) return false;
     g.s.hp-=n;
     g.s.paidLife=true;
     return true;
   };
-  const recoverable=(g,filter)=>!g.s.recovered&&g.s.hand.length<10?
+  const recoverable=(g,filter)=>g.s.hand.length<10?
     g.s.discard.filter(id=>real(id)&&filter(CARDS[id])):[];
   const recoverCheck=filter=>(g,c)=>recoverable(g,filter).length>0||
-    (!g.s.recovered&&g.s.hand.length===10&&!c.paid&&g.s.discard.some(id=>real(id)&&filter(CARDS[id])));
+    (g.s.hand.length===10&&!c.paid&&g.s.discard.some(id=>real(id)&&filter(CARDS[id])));
   async function recover(g,filter){
     const id=await g.pickCard('选择一张弃牌取回手牌',recoverable(g,filter));
-    if(id){g.s.hand.push(remove(g.s.discard,id));g.s.recovered=true;}
+    if(id){g.s.hand.push(remove(g.s.discard,id));}
   }
   const c0=c=>c.c===0, c1=c=>c.c===1, c2=c=>c.c>=2, any=()=>true;
   async function sift(g,limit=1){
@@ -137,7 +135,6 @@ const CardPool = (() => {
       g.s.discard.push(g.s.drawPile.pop());
     }
   }
-  const specialOnce=(g,c)=>!g.s.once.has(c.card.id);
   const thresholdReward=reward=>seq((g,c)=>{
     const crossed=cross(g,c,7);
     g.hit(7);
@@ -151,15 +148,14 @@ const CardPool = (() => {
       [seq(block(6),gainEcho(3))],
       [gainEcho(2)],
       [async g=>{
-        const amounts=Array.from({length:Math.min(3,g.s.buffs.echo)},(_,i)=>i+1);
-        const amount=await g.pickOption('消耗多少回声？',amounts,n=>`消耗 ${n} 层`);
-        g.hit(7+takeEcho(g,amount||0));
+        const spend=echo(g)&&await g.confirmEffect(`消耗全部 ${g.s.buffs.echo} 层回声？`);
+        g.hit(7+(spend?takeEcho(g):0));
       },echo],
       [seq(block(10),gainEcho(6))],
       [(g,c)=>{const bonus=echo(g)?2:0;g.hit(4);if(g.s.e.hp>0) g.buff('echo',3+bonus);},echo],
       [seq(hit(9),gainEcho(6))],
       [seq(block(6),gainEcho(3),choose(g=>g.s.buffs.echo>=6,draw(1))),hasEchoFour],
-      [g=>{strip(g,takeEcho(g,6));g.hit(12);},echo],
+      [g=>{strip(g,takeEcho(g));g.hit(12);},echo],
       [seq(block(10),gainEcho(12))]
     ],
     breakwater:[
@@ -202,7 +198,7 @@ const CardPool = (() => {
         g.s.hand[index]=current;
         g.s.drawPile[g.s.drawPile.length-1]=id;
         g.s.hidden.delete(id);
-        if(g.s.retain===id) g.s.retain=null;
+        g.s.retain.delete(id);
         g.s.planned=true;
       }),(g,c)=>Boolean(top(g))&&stocked(g,c)],
       [choose(planned,block(16),block(10)),planned],
@@ -217,10 +213,10 @@ const CardPool = (() => {
       [(g,c)=>{g.hit(2);if(sealSelf(g,c)&&g.s.e.hp>0) g.hit(3);},selfSeal],
       [seq(block(7),async(g,c)=>{if(await seal(g,c,card=>card.c>=1)) clean(3)(g);}),
         (g,c)=>canSeal(g,c)&&hand(g,c,card=>card.c>=1).length>0],
-      [g=>g.block(9+Math.min(8,g.s.sealed.size*2)),g=>g.s.sealed.size>0],
+      [g=>g.block(9+g.s.sealed.size*2),g=>g.s.sealed.size>0],
       [async(g,c)=>g.hit(await seal(g,c)?17:10),canSeal],
       [seq(block(5),async(g,c)=>{if(await seal(g,c)) g.draw(2);}),canSeal],
-      [g=>g.hit(10+Math.min(10,g.s.sealed.size*2)),g=>g.s.sealed.size>0],
+      [g=>g.hit(10+g.s.sealed.size*2),g=>g.s.sealed.size>0],
       [seq(block(8),async(g,c)=>{for(let i=0;i<2&&g.s.e.hp>0;i++){if(!await seal(g,c)) break;g.hit(9);}}),canSeal]
     ],
     stress:[
@@ -230,8 +226,7 @@ const CardPool = (() => {
       [choose(peril,hit(10),hit(6)),peril],
       [seq(async g=>g.hit(await payLife(3)(g)?17:11),choose(peril,block(4))),g=>peril(g)||pain(3)(g)],
       [choose(leaky,block(11),block(7)),leaky],
-      [seq(block(5),choose((g,c)=>peril(g)&&specialOnce(g,c),(g,c)=>{g.s.once.add(c.card.id);g.heal(4);})),
-        (g,c)=>peril(g)&&specialOnce(g,c)],
+      [seq(block(5),choose(peril,g=>g.heal(4))),peril],
       [seq(hit(12),choose(peril,seq(hit(6),block(6)))),peril],
       [seq(block(10),choose(peril,seq(clean(4),block(6)))),peril],
       [choose(peril,damageAndBlock(25,10),hit(17)),peril]
@@ -246,8 +241,8 @@ const CardPool = (() => {
       [seq(hit(7),choose(afterDefense,draw(1))),afterDefense],
       [choose(reserve,seq(hit(16),draw(1)),hit(10)),reserve],
       [seq(block(6),async(g,c)=>{
-        const id=await g.pickCard('选择一张伏藏手牌减费',hand(g,c,card=>g.s.hidden.has(card.token)&&!g.s.discounts.has(card.token)&&card.c>0));
-        if(id) g.s.discounts.add(id);
+        const id=await g.pickCard('选择一张伏藏手牌减费',hand(g,c,card=>discountable(g,card)));
+        if(id) g.s.discounts.set(id,(g.s.discounts.get(id)||0)+1);
       }),retainDiscount],
       [choose(reserve,damageAndBlock(20,8),hit(12)),reserve]
     ],
@@ -264,16 +259,16 @@ const CardPool = (() => {
       [seq(hit(13),block(5),choose(flanked,draw(2))),flanked]
     ],
     vent:[
-      [seq(block(4),vent(1,hit(8))),freeVent],
-      [seq(hit(4),vent(1,block(8))),freeVent],
+      [seq(block(4),vent(1,hit(8)))],
+      [seq(hit(4),vent(1,block(8)))],
       [choose(canRetime,g=>{pendingVent(g).turn--;},block(2)),canRetime],
       [choose(vented,block(9),block(6)),vented],
-      [seq(block(6),vent(2,hit(18))),freeVent],
+      [seq(block(6),vent(2,hit(18)))],
       [choose(vented,hit(10),hit(6)),vented],
-      [seq(block(8),vent(2,seq(block(13),draw(1)))),freeVent],
+      [seq(block(8),vent(2,seq(block(13),draw(1))))],
       [seq(block(5),async g=>{const item=pendingVent(g);if(item&&await g.confirmEffect('拆除最早喷口，立刻造成 9 伤害？')){remove(g.s.delayed,item);g.hit(9);}}),g=>Boolean(pendingVent(g))],
       [choose(vented,damageAndBlock(15,4),hit(9)),vented],
-      [seq(block(8),vent(1,hit(12)),vent(2,hit(16))),freeVent]
+      [seq(block(8),vent(1,hit(12)),vent(2,hit(16)))]
     ],
     net:[
       [seq(hit(6),choose(few,hit(3))),few],
@@ -305,7 +300,7 @@ const CardPool = (() => {
       [thresholdReward(block(5)),(g,c)=>cross(g,c,7)],
       [choose(full,block(9),block(6)),full],
       [choose(harvest,hit(5),hit(2)),harvest],
-      [choose(middle,hit(16),hit(11)),middle],
+      [(g,c)=>{const activates=cross(g,c,11);g.hit(activates?16:11);},(g,c)=>cross(g,c,11)],
       [choose(full,damageAndBlock(16,4),hit(12)),full],
       [seq(block(6),choose(harvest,draw(1))),harvest],
       [thresholdReward(draw(2)),(g,c)=>cross(g,c,7)],
@@ -333,8 +328,8 @@ Object.assign(Game,{
   initPoolFight(){
     this.clearTokens();
     Object.assign(this.s,{
-      tokenNo:0,sealed:new Set(),once:new Set(),hidden:new Set(),discounts:new Set(),
-      delayed:[],retain:null,extraDraw:0,resolving:null,_playedThisTurn:false,nextEnergy:0
+      tokenNo:0,sealed:new Set(),hidden:new Set(),discounts:new Map(),
+      delayed:[],retain:new Set(),extraDraw:0,resolving:null,_playedThisTurn:false,nextEnergy:0
     });
     this.s.buffs.echo=0;
   },
@@ -343,8 +338,8 @@ Object.assign(Game,{
     const s=this.s;
     Object.assign(s,{
       attacked:false,defended:false,planned:false,brokeArmor:false,sealedNow:false,
-      paidLife:false,usedHidden:false,dived:false,diveQueued:false,vented:false,
-      recovered:false,extraDamageUsed:false,tideAttackUsed:false,tideBlockUsed:false
+      paidLife:false,usedHidden:false,dived:false,vented:false,
+      extraDamageUsed:false,tideAttackUsed:false,tideBlockUsed:false
     });
     s.discounts.clear();
     if(s.turnNo>1) this.changeTide(!s.tide);
@@ -366,14 +361,14 @@ Object.assign(Game,{
 
   finishPoolTurn(){
     const s=this.s;
-    const id=s.hand.includes(s.retain)?s.retain:null;
-    s.hidden.clear();
+    const kept=s.hand.filter(id=>s.retain.has(id));
+    s.hidden=new Set(kept);
     while(s.hand.length){
       const card=s.hand.pop();
-      if(card!==id&&!CARDS[card].temporary) s.discard.push(card);
+      if(!s.hidden.has(card)&&!CARDS[card].temporary) s.discard.push(card);
     }
-    if(id){s.hand.push(id);s.hidden.add(id);}
-    s.retain=null;
+    s.hand.push(...kept);
+    s.retain.clear();
     if(s.buffs.echo>0){
       this.log('回声造成 '+s.buffs.echo+' 伤害');
       this.hit(s.buffs.echo);
@@ -461,9 +456,9 @@ Object.assign(Game,{
   previewDamage(n,beforeArmor=false,pierce=false){
     const s=this.s,e=s.e;
     const eligible=!s.extraDamageUsed;
-    const bonus=eligible?s.buffs.glow+(s.voltPower?Math.min(5,e.shock):0):0;
+    const bonus=eligible?s.buffs.glow+(e.shock*s.voltPower):0;
     const tide=s.tide&&!s.tideAttackUsed?2:0;
-    const amount=Math.round((n+bonus+tide)*(1+e.vuln*.25));
+    const amount=Math.round((n+bonus+tide)*(1+e.vuln*.05));
     return beforeArmor||pierce?amount:Math.max(0,amount-e.block);
   },
 
@@ -473,7 +468,7 @@ Object.assign(Game,{
     const ctx=s.resolving;
     const direct=ctx&&!ctx.passive;
     const before=e.block;
-    let damage=direct?this.previewDamage(n,true):Math.round(n*(1+e.vuln*.25));
+    let damage=direct?this.previewDamage(n,true):Math.round(n*(1+e.vuln*.05));
     if(direct){
       s.extraDamageUsed=true;
       if(s.tide) s.tideAttackUsed=true;
@@ -498,8 +493,8 @@ Object.assign(Game,{
   },
 
   buff(key,n){
-    const buffs=this.s.buffs, limit={echo:16,glow:5,swarm:6,growth:5}[key]??Infinity;
-    buffs[key]=Math.max(0,Math.min(limit,(buffs[key]||0)+n));
+    const buffs=this.s.buffs;
+    buffs[key]=Math.max(0,(buffs[key]||0)+n);
     return buffs[key];
   }
 });
@@ -633,12 +628,12 @@ const expansionSpecies = {
     ["港湾鼠海豚", 1, "c", "造成 5 伤害，获得 3 层回声。", "Phocoena phocoena"],
     ["北瓶鼻鲸", 1, "c", "获得 6 护甲，获得 3 层回声。", "Hyperoodon ampullatus"],
     ["短吻真海豚", 0, "c", "获得 2 层回声。", "Delphinus delphis"],
-    ["印度太平洋瓶鼻海豚", 1, "c", "可先消耗至多 3 层回声。造成 7 伤害，每消耗 1 层再加 1。", "Tursiops aduncus"],
+    ["印度太平洋瓶鼻海豚", 1, "c", "可先消耗全部回声。造成 7 伤害，每消耗 1 层再加 1。", "Tursiops aduncus"],
     ["领航鲸", 2, "u", "获得 10 护甲，获得 6 层回声。", "Globicephala melas"],
     ["太平洋斑纹海豚", 1, "u", "造成 4 伤害，获得 3 层回声。若此前已有回声，再获得 2 层。", "Sagmatias obliquidens"],
     ["里氏海豚", 2, "u", "造成 9 伤害，获得 6 层回声。", "Grampus griseus"],
     ["飞旋海豚", 1, "r", "获得 6 护甲和 3 层回声。若施加后回声达到 6 层，抽 1 张牌。", "Stenella longirostris"],
-    ["居氏喙鲸", 2, "r", "消耗至多 6 层回声。移除敌人等同于消耗量的护甲，再造成 12 伤害。", "Ziphius cavirostris"],
+    ["居氏喙鲸", 2, "r", "消耗全部回声。移除敌人等同于消耗量的护甲，再造成 12 伤害。", "Ziphius cavirostris"],
     ["白鲸", 3, "l", "获得 10 护甲，获得 12 层回声。", "Delphinapterus leucas"],
   ],
   breakwater: [
@@ -683,10 +678,10 @@ const expansionSpecies = {
     ["锯缘青蟹", 1, "c", "获得 6 护甲。若本回合已封存过牌，抽 1 张牌。", "Scylla serrata"],
     ["北方长额虾", 0, "c", "造成 2 伤害。若成功封存此牌，再造成 3 伤害。", "Pandalus borealis"],
     ["厚纹蟹", 1, "u", "获得 7 护甲。可封存一张基础费用至少为 1 的手牌，若成功，清除自身至多 3 层剧毒。", "Pachygrapsus crassipes"],
-    ["雪蟹", 2, "u", "获得 9 护甲。本场每封存过一张牌，再获得 2 护甲，最多额外 8。", "Chionoecetes opilio"],
+    ["雪蟹", 2, "u", "获得 9 护甲。本场每封存过一张牌，再获得 2 护甲。", "Chionoecetes opilio"],
     ["三疣梭子蟹", 2, "u", "造成 10 伤害。可封存一张手牌，若成功，改为造成 17 伤害。", "Portunus trituberculatus"],
     ["中国对虾", 1, "r", "获得 5 护甲。可封存一张手牌，若成功，抽 2 张牌。", "Penaeus chinensis"],
-    ["日本对虾", 2, "r", "造成 10 伤害。本场每封存过一张牌，再加 2 伤害，最多额外 10。", "Penaeus japonicus"],
+    ["日本对虾", 2, "r", "造成 10 伤害。本场每封存过一张牌，再加 2 伤害。", "Penaeus japonicus"],
     ["斑节对虾", 2, "l", "获得 8 护甲。可依次封存至多两张手牌，每成功封存一张，造成 9 伤害。", "Penaeus monodon"],
   ],
   stress: [
@@ -696,7 +691,7 @@ const expansionSpecies = {
     ["黄边裸胸鳝", 1, "c", "造成 6 伤害。【临险】改为 10 伤害。", "Gymnothorax flavimarginatus"],
     ["剑旗鱼", 2, "u", "可失去 3 生命。随后造成 11 伤害，若支付成功改为 17。【临险】再获得 4 护甲。", "Xiphias gladius"],
     ["大眼金枪鱼", 1, "u", "获得 7 护甲。若本回合此前主动失去过生命，再获得 4 护甲。", "Thunnus obesus"],
-    ["欧洲海鲈", 1, "u", "获得 5 护甲。【临险】恢复 4 生命，本场只在第一次满足临险时治疗。", "Dicentrarchus labrax"],
+    ["欧洲海鲈", 1, "u", "获得 5 护甲。【临险】恢复 4 生命。", "Dicentrarchus labrax"],
     ["钩吻鲑", 2, "r", "造成 12 伤害。【临险】再造成 6 伤害，获得 6 护甲。", "Oncorhynchus kisutch"],
     ["长鳍金枪鱼", 2, "r", "获得 10 护甲。【临险】清除自身至多 4 层剧毒，再获得 6 护甲。", "Thunnus alalunga"],
     ["尖吻鲭鲨", 3, "l", "造成 17 伤害。【临险】改为 25 伤害，并获得 10 护甲。", "Isurus oxyrinchus"],
@@ -710,7 +705,7 @@ const expansionSpecies = {
     ["椰子章鱼", 2, "u", "获得 12 护甲，可为一张手牌施加【留牌】。若选择了牌，下回合抽牌前获得 3 护甲。", "Amphioctopus marginatus"],
     ["圆斑拟章鱼", 1, "u", "造成 7 伤害。若本回合此前打出过伏藏牌，抽 1 张牌。", "Callistoctopus macropus"],
     ["黄眼裸胸鳝", 2, "r", "造成 10 伤害。若此牌伏藏，改为 16 伤害并抽 1 张牌。", "Gymnothorax nudivomer"],
-    ["叶形海鲉", 1, "r", "获得 6 护甲。可让一张当前伏藏的手牌在本回合少付 1 洋流，最多减 1。", "Taenianotus triacanthus"],
+    ["叶形海鲉", 1, "r", "获得 6 护甲。可让一张当前伏藏的手牌在本回合少付 1 洋流。", "Taenianotus triacanthus"],
     ["巨型躄鱼", 2, "l", "造成 12 伤害。若此牌伏藏，改为 20 伤害并获得 8 护甲。", "Antennarius commerson"],
   ],
   flank: [
@@ -766,7 +761,7 @@ const expansionSpecies = {
     ["蓝圆鲹", 1, "c", "造成 7 伤害。若命中后把敌人从收割线以上压进收割线，获得 5 护甲。", "Decapterus maruadsi"],
     ["北方塘鹅", 1, "c", "获得 6 护甲。【满势】再获得 3 护甲。", "Morus bassanus"],
     ["褐鹈鹕", 0, "c", "造成 2 伤害。【收割】改为 5 伤害。", "Pelecanus occidentalis"],
-    ["条纹鲈", 2, "u", "造成 11 伤害。若敌人生命高于 30% 且低于 75%，改为 16 伤害。", "Morone saxatilis"],
+    ["条纹鲈", 2, "u", "造成 11 伤害。若 11 点基础伤害足以把敌人打进收割线，改为 16 伤害。", "Morone saxatilis"],
     ["黄鳍金枪鱼", 2, "u", "造成 12 伤害。【满势】改为 16 伤害，并获得 4 护甲。", "Thunnus albacares"],
     ["银鸥", 1, "u", "获得 6 护甲。【收割】抽 1 张牌。", "Larus argentatus"],
     ["大西洋马鲛", 1, "r", "造成 7 伤害。若命中后把敌人从收割线以上压进收割线，抽 2 张牌。", "Scomberomorus maculatus"],
@@ -821,22 +816,22 @@ for(const [key,rows] of Object.entries(expansionSpecies)){
 Object.assign(KW,{
   吞噬:'吞噬：可从手中选一张原件丢弃以强化本牌。饵料被吃时另有效果。',
   饵料:'饵料：可正常打出。被吞噬时触发词条所写效果。',
-  发光:'发光：上限 5。本轮第一次卡牌伤害每层加 1。',
-  虫群:'虫群：上限 6。每轮结束造成等同层数的伤害，然后减少 1 层。',
-  成长:'成长：上限 5。下回合起，每次回合开始获得等同层数的护甲。',
+  发光:'发光：本轮第一次卡牌伤害每层加 1。',
+  虫群:'虫群：每轮结束造成等同层数的伤害，然后减少 1 层。',
+  成长:'成长：下回合起，每次回合开始获得等同层数的护甲。',
   涨潮:'涨潮：本轮第一次卡牌伤害额外加 2；回合开始时与退潮交替。',
   退潮:'退潮：本轮第一张提供护甲的牌额外加 2 护甲。',
-  回声:'回声：上限 16。回合结束造成等同层数的伤害，然后清空。',
-  潜航:'潜航：每回合可额外支付一次标明的费用，在下回合开局兑现。',
+  回声:'回声：回合结束造成等同层数的伤害，然后清空。',
+  潜航:'潜航：每次打出可额外支付标明的费用，在下回合开局兑现。',
   置顶:'置顶：把一张牌放到下一次抽取的位置。',
-  封存:'封存：把牌移出本场循环。至少保留四张原件，战后恢复牌库。',
-  临险:'临险：己方生命不高于最大生命的 40%。',
+  封存:'封存：把牌移出本场循环。至少保留一张原件，战后恢复牌库。',
+  临险:'临险：己方生命不高于最大生命的 50%。',
   留牌:'留牌：选一张原件跳过本轮弃牌，下轮进入伏藏。',
   伏藏:'伏藏：由留牌带到本回合的牌获得此状态，离手清除。',
-  喷口:'喷口：热泉的延迟效果，同时最多存在两个。',
-  回收:'回收：从弃牌堆取回一张原件，每轮最多成功一次。',
-  满势:'满势：敌方生命至少为最大生命的 75%。',
-  收割:'收割：敌方生命不高于最大生命的 30%。'
+  喷口:'喷口：热泉的延迟效果，到指定回合自动喷发。',
+  回收:'回收：从弃牌堆取回一张原件。',
+  满势:'满势：敌方生命高于最大生命的 50%。',
+  收割:'收割：敌方生命不高于最大生命的 50%。'
 });
 
 const reviseCard=(id,d,f,activates)=>{
@@ -855,14 +850,14 @@ reviseCard('orca','造成 19 伤害。【吞噬】改为 24 伤害，并获得 6
 reviseCard('barracuda','造成 7 伤害。【吞噬】再抽 2 张。',(g,c)=>{g.hit(7);if(c.ate&&g.s.e.hp>0) g.draw(2);});
 reviseCard('tuna','造成 13 伤害。【吞噬】再造成 5 伤害。',(g,c)=>{g.hit(13);if(c.ate) g.hit(5);});
 reviseCard('crab','获得 8 护甲。若打出前已有至少 5 护甲，再获得 3 护甲。',g=>g.block(g.s.p.block>=5?11:8),g=>g.s.p.block>=5);
-reviseCard('horseshoe','获得 12 护甲。下回合保留至多 8 点剩余护甲。',g=>{g.block(12);g.s.keepBlock=true;});
+reviseCard('horseshoe','获得 12 护甲。下回合保留全部剩余护甲。',g=>{g.block(12);g.s.keepBlock=true;});
 reviseCard('sponge','获得 6 护甲，恢复 2 生命，清除自身 1 层剧毒。',g=>{g.block(6);g.heal(2);CardPool.clean(1)(g);},g=>g.s.p.poison>0);
 reviseCard('coral','获得 8 护甲，恢复 2 生命。',g=>{g.block(8);g.heal(2);});
 reviseCard('fireflysquid','发光 +1 层，然后造成 5 伤害。',g=>{g.buff('glow',1);g.hit(5);});
 reviseCard('deepglow','发光 +2 层，抽 2 张牌。',g=>{g.buff('glow',2);g.draw(2);});
 reviseCard('flashlight','造成 6 伤害。若至少有 3 层发光，再造成 3 伤害。',g=>{g.hit(6);if(g.s.buffs.glow>=3) g.hit(3);},g=>g.s.buffs.glow>=3);
-reviseCard('lumenburst','消耗至多 3 层发光。造成 11 伤害，每消耗 1 层再加 3。',g=>{
-  const spent=Math.min(3,g.s.buffs.glow);g.buff('glow',-spent);g.hit(11+3*spent);
+reviseCard('lumenburst','消耗全部发光。造成 11 伤害，每消耗 1 层再加 3。',g=>{
+  const spent=g.s.buffs.glow;g.buff('glow',-spent);g.hit(11+3*spent);
 },g=>g.s.buffs.glow>0);
 reviseCard('brilliant','获得 3 层发光、12 护甲，恢复等同于当前发光层数的生命。',g=>{const n=g.buff('glow',3);g.block(12);g.heal(n);});
 reviseCard('seaspider','造成 6 伤害，每层虫群再加 1。',g=>g.hit(6+g.s.buffs.swarm),g=>g.s.buffs.swarm>0);
@@ -874,19 +869,20 @@ reviseCard('zoox','获得 1 护甲，成长 +1 层。',g=>{g.block(1);g.buff('gr
 reviseCard('seafan','获得 5 护甲，成长 +1 层。',g=>{g.block(5);g.buff('growth',1);});
 reviseCard('ecoecho','获得 13 护甲，恢复 3 生命，每层成长多恢复 1 生命。',g=>{g.block(13);g.heal(3+g.s.buffs.growth);},g=>g.s.buffs.growth>0);
 reviseCard('symbiowing','成长 +2 层，获得 10 护甲。',g=>{g.buff('growth',2);g.block(10);});
-reviseCard('storm','造成 16 伤害。消耗至多 5 层麻痹，每层使伤害增加 3。',g=>{
-  const spent=Math.min(5,g.s.e.shock);g.s.e.shock-=spent;g.hit(16+spent*3);
+reviseCard('storm','造成 16 伤害。消耗全部麻痹，每层使伤害增加 3。',g=>{
+  const spent=g.s.e.shock;g.s.e.shock-=spent;g.hit(16+spent*3);
 },g=>g.s.e.shock>0);
-reviseCard('voltcore','施加 2 层麻痹并获得 7 护甲。部署后，本场每轮第一次卡牌伤害，每层麻痹额外加 1，最多加 5。',g=>{g.shk(2);g.block(7);g.s.voltPower=true;});
+reviseCard('voltcore','施加 2 层麻痹并获得 7 护甲。部署一层电核。本场每轮第一次卡牌伤害，每层电核与每层麻痹相乘后增加等量伤害。',g=>{g.shk(2);g.block(7);g.s.voltPower++;});
 reviseCard('tidecall','切换潮汐。进入涨潮时抽 2 张牌。',g=>{g.changeTide(!g.s.tide);if(g.s.tide) g.draw(2);},isLowTide);
 reviseCard('tsunami','造成 20 伤害，切换潮汐。',g=>{g.hit(20);if(g.s.e.hp>0) g.changeTide(!g.s.tide);});
 reviseCard('tidefull','进入涨潮，获得 4 护甲。',g=>{g.changeTide(true);g.block(4);},isLowTide);
 CARDS.tidefull.c=1;
-reviseCard('tideheart','部署一次。本场每次由退潮进入涨潮时，造成 6 伤害。',g=>{g.s.tideBonus=6;},g=>!g.s.tideBonus);
-reviseCard('permafrost','获得 5 护甲。本场首次打出时取消敌方当前意图。',(g,c)=>{
-  g.block(5);if(!g.s.once.has(c.card.id)){g.s.once.add(c.card.id);g.s.skipEnemy=true;}
-},(g,c)=>!g.s.once.has(c.card.id));
-reviseCard('paralyze','敌人下次攻击伤害减半。重复打出刷新。',g=>{g.s.paralyze=50;});
+reviseCard('tideheart','本场每次由退潮进入涨潮时，额外造成 6 伤害。',g=>{g.s.tideBonus+=6;});
+reviseCard('permafrost','获得 5 护甲。增加 1 层封冻，抵消敌方接下来一次行动。',g=>{g.block(5);g.s.skipEnemy++;});
+reviseCard('abysshush','增加 1 层封冻，抵消敌方接下来一次行动，并施加 5 层麻痹。',g=>{g.s.skipEnemy++;g.shk(5);});
+reviseCard('fog','本场敌方攻击伤害减半，每次打出叠加一层。',g=>{g.s.fog++;});
+reviseCard('zeropoint','本场敌方攻击伤害减半，每次打出叠加一层。',g=>{g.s.frozenHalf++;});
+reviseCard('paralyze','获得一层瘫痪。每层使敌人下一次攻击伤害减半，结算后清空。',g=>{g.s.paralyze++;});
 for(const id of ['cuttlefish','filefish','seadragon','wonderpus','octopus','twin','mimicmaster']) CARDS[id].copyEffect=true;
 reviseCard('cuttlefish',CARDS.cuttlefish.d,g=>{g.hit(5);if(g.s.e.hp>0) g.mimicHand(true);},g=>g.s.hand.some(id=>!CARDS[id].temporary&&!CARDS[id].copyEffect));
 reviseCard('seadragon',CARDS.seadragon.d,g=>{g.block(9);g.mimicHand(false,c=>c.defense);},g=>g.s.hand.some(id=>CARDS[id].defense&&!CARDS[id].temporary&&!CARDS[id].copyEffect));
@@ -915,3 +911,27 @@ for(const id of ['filefish','twin','wonderpus','octopus','mimicmaster']){
 }
 CARDS.mirrorink.activates=g=>g.s.discard.length>0;
 CARDS.voltchain.activates=g=>g.s.e.shock>1;
+
+// Species artwork added from licensed images. See artwork.html.
+for(const id of [
+  'abalone','abysshush','amphipod','barnacle','breakwater_01','breakwater_02','breakwater_03','breakwater_04',
+  'breakwater_05','breakwater_06','breakwater_07','breakwater_08','breakwater_09','brilliant','copepod','crab',
+  'deepglow','dive_01','dive_02','dive_03','dive_05','dive_06','dive_07','dive_08',
+  'dive_09','dive_10','echo_01','echo_02','echo_03','echo_04','echo_05','echo_06',
+  'echo_07','echo_08','echo_09','echo_10','ecoecho','filefish','filter_01','filter_02',
+  'filter_03','filter_04','filter_05','filter_06','filter_07','filter_08','filter_09','filter_10',
+  'flank_01','flank_02','flank_03','flank_04','flank_05','flank_06','flank_07','flank_08',
+  'flank_09','flank_10','flyingfish','glowtendril','hermit','hide_01','hide_02','hide_03',
+  'hide_04','hide_05','hide_06','hide_08','hide_09','hide_10','icewall','inkstain',
+  'inkveil','lanternfish','lowtide','lumenburst','mangrove','migrate_01','migrate_02','migrate_03',
+  'migrate_04','migrate_05','migrate_06','migrate_08','migrate_09','migrate_10','mimicmaster','mirrorink',
+  'molt_01','molt_02','molt_03','molt_04','molt_05','molt_06','molt_07','molt_08',
+  'molt_09','molt_10','moray','net_01','net_02','net_04','net_05','net_06',
+  'net_07','net_08','net_09','net_10','paralyze','permafrost','pursuit_01','pursuit_02',
+  'pursuit_03','pursuit_04','pursuit_05','pursuit_06','pursuit_07','pursuit_08','pursuit_09','pursuit_10',
+  'reef','seabutterfly','shockwave','sponge','static','storm','stress_01','stress_02',
+  'stress_03','stress_04','stress_05','stress_06','stress_07','stress_08','stress_09','stress_10',
+  'surf','surge','swarmtide','symbiowing','thunder','tidecall','tidefull','tideheart',
+  'tidepool','toxicbloom','tsunami','twin','vent_02','vent_05','vent_06','vent_07',
+  'vent_10','voltchain',
+]) CARDS[id].img='species/'+id;
