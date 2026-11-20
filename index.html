@@ -6,263 +6,211 @@
 <title>墨水与触手 · 深海牌局</title>
 <style>
 :root{
-  --deep:#0b1d19; --deep2:#0e241f; --deep3:#14302a;
-  --mid:#31534b; --mid2:#3f6b60; --line:#567158;
-  --mint:#a7f3d0; --teal:#5eead4; --teal2:#6ee7b7; --pale:#ccfbf1;
-  --cream:#fefef8; --pink:#ffb4dc; --lav:#dcb4ff; --cyan:#78dcff;
-  --purple:#9a84e6; --gold:#fef08a; --coral:#ff8b7b;
-  --r:18px;
+  --deep:#0b1d19;--deep2:#0e241f;--deep3:#14302a;--mid:#31534b;--mid2:#3f6b60;--line:#567158;
+  --mint:#a7f3d0;--teal:#5eead4;--teal2:#6ee7b7;--pale:#ccfbf1;--cream:#fefef8;
+  --pink:#ffb4dc;--lav:#dcb4ff;--cyan:#78dcff;--purple:#9a84e6;--gold:#fef08a;--coral:#ff8b7b;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
+html,body{margin:0;min-height:100%}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  background:
-    radial-gradient(1200px 600px at 50% -10%, #1b4238 0%, transparent 60%),
-    radial-gradient(800px 500px at 90% 100%, #10312b 0%, transparent 55%),
-    linear-gradient(180deg,#0b1d19,#0a1a17 60%,#081614);
-  color:var(--pale);min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(1200px 600px at 50% -10%,#1b4238 0%,transparent 60%),
+             radial-gradient(800px 500px at 90% 100%,#10312b 0%,transparent 55%),
+             linear-gradient(180deg,#0b1d19,#0a1a17 60%,#081614);
+  color:var(--pale);overflow-x:hidden;
 }
-body::before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:radial-gradient(circle,rgba(167,243,208,.13) 1px,transparent 1px);
-  background-size:26px 26px;opacity:.5;
-}
-.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:14px 16px 30px}
+  background-size:26px 26px;opacity:.45}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:12px 14px 34px}
 
-/* ---------- 顶栏 ---------- */
-.topbar{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  background:rgba(20,48,42,.82);border:1.5px solid var(--line);
-  backdrop-filter:blur(10px);
-  border-radius:16px;padding:9px 14px;margin-bottom:14px;
-  box-shadow:0 8px 26px rgba(0,0,0,.28);
-}
-.pill{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(11,29,25,.72);border:1.5px solid var(--mid);
-  color:var(--mint);border-radius:999px;padding:5px 13px;
-  font-size:13px;font-weight:700;white-space:nowrap;
-}
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(20,48,42,.86);
+  border:1.5px solid var(--line);backdrop-filter:blur(10px);border-radius:16px;padding:8px 12px;
+  margin-bottom:12px;box-shadow:0 8px 26px rgba(0,0,0,.28)}
+.pill{display:inline-flex;align-items:center;gap:5px;background:rgba(11,29,25,.72);
+  border:1.5px solid var(--mid);color:var(--mint);border-radius:999px;padding:4px 12px;
+  font-size:12.5px;font-weight:700;white-space:nowrap}
 .pill b{color:var(--cream)}
-.relics{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.relic{
-  width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
-  background:rgba(94,234,212,.13);border:1.5px solid var(--teal);
-  font-size:16px;cursor:help;position:relative;transition:.15s;
-}
-.relic:hover{baskground:rgba(94,234,212,.28);transform:translateY(-2px)}
-.relic:hover::after{
-  content:attr(data-tip);position:absolute;top:40px;right:0;width:210px;
-  background:#0b1d19;border:1.5px solid var(--teal);color:var(--pale);
-  padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.45;
-  z-index:99;white-space:normal;font-weight:600;
-}
-.btn{
-  border:none;cursor:pointer;font-family:inherit;font-weight:800;
-  border-radius:999px;padding:9px 18px;font-size:14px;
-  background:linear-gradient(180deg,var(--teal2),var(--teal));
-  color:#0b1d19;transition:transform .12s,filter .12s;
-  box-shadow:0 4px 14px rgba(94,234,212,.24);
-}
+.relics{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.relic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:rgba(94,234,212,.13);border:1.5px solid var(--teal);font-size:15px;cursor:help;position:relative}
+.relic:hover::after{content:attr(data-tip);position:absolute;top:38px;right:0;width:200px;
+  background:#0b1d19;border:1.5px solid var(--teal);color:var(--pale);padding:8px 10px;border-radius:10px;
+  font-size:12px;line-height:1.45;z-index:99;font-weight:600}
+.btn{border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:999px;
+  padding:9px 18px;font-size:14px;background:linear-gradient(180deg,var(--teal2),var(--teal));
+  color:#0b1d19;transition:transform .12s,filter .12s;box-shadow:0 4px 14px rgba(94,234,212,.24)}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
 .btn:active{transform:translateY(0) scale(.98)}
 .btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--mint);box-shadow:none}
-.btn.pink{background:linear-gradient(180deg,#ffc6e3,var(--pink));color:#3d1130;box-shadow:0 4px 14px rgba(255,180,220,.25)}
-.btn.gold{background:linear-gradient(180deg,#fff7b8,var(--gold));color:#3a2f00;box-shadow:0 4px 14px rgba(254,240,138,.25)}
-.btn.sm{padding:6px 12px;font-size:12.5px}
+.btn.pink{background:linear-gradient(180deg,#ffc6e3,var(--pink));color:#3d1130}
+.btn.gold{background:linear-gradient(180deg,#fff7b8,var(--gold));color:#3a2f00}
+.btn.lav{background:linear-gradient(180deg,#ecd9ff,var(--lav));color:#2f1a52}
+.btn.sm{padding:5px 11px;font-size:12px}
+.btn[disabled]{opacity:.42;cursor:not-allowed;filter:grayscale(.5);transform:none}
 
-/* ---------- 标题页 ---------- */
-.hero{
-  text-align:center;padding:34px 22px 30px;
-  background:linear-gradient(180deg,rgba(20,48,42,.9),rgba(11,29,25,.92));
-  border:1.5px solid var(--line);border-radius:26px;
-  box-shadow:0 18px 50px rgba(0,0,0,.4);
-}
-.hero h1{
-  margin:14px 0 6px;font-size:clamp(24px,4.6vw,40px);letter-spacing:1px;
-  background:linear-gradient(180deg,#fff,#a7f3d0 70%,#5eead4);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.hero .sub{color:#8fbfae;font-size:13px;letter-spacing:2px;margin-bottom:16px}
-.hero p{color:#b9d9cf;line-height:1.85;font-size:14.5px;max-width:620px;margin:0 auto 8px}
-.hero .art{
-  width:132px;height:132px;margin:0 auto;border-radius:50%;overflow:hidden;
-  border:3px solid var(--teal);box-shadow:0 0 0 8px rgba(94,234,212,.09),0 10px 30px rgba(0,0,0,.4);
-}
-.hero .art img{width:100%;height:100%;object-fit:cover;display:block}
-.tagrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0 4px}
-.tagrow span{font-size:12px;padding:4px 11px;border-radius:999px;background:rgba(94,234,212,.1);
+/* 标题 */
+.hero{text-align:center;padding:30px 20px 28px;background:linear-gradient(180deg,rgba(20,48,42,.92),rgba(11,29,25,.94));
+  border:1.5px solid var(--line);border-radius:26px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.hero h1{margin:12px 0 4px;font-size:clamp(23px,4.4vw,38px);letter-spacing:1px;
+  background:linear-gradient(180deg,#fff,#a7f3d0 70%,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub{color:#8fbfae;font-size:12px;letter-spacing:3px;margin-bottom:14px}
+.hero p{color:#b9d9cf;line-height:1.85;font-size:14px;max-width:640px;margin:0 auto 6px}
+.hero .art{width:120px;height:120px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid var(--teal);
+  box-shadow:0 0 0 8px rgba(94,234,212,.09),0 10px 30px rgba(0,0,0,.4);background:#08110f}
+.hero .art img{width:100%;height:100%;object-fit:cover}
+.tagrow{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:16px 0 2px}
+.tagrow span{font-size:11.5px;padding:4px 11px;border-radius:999px;background:rgba(94,234,212,.1);
   border:1px solid rgba(94,234,212,.3);color:var(--mint)}
-.cta{margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.cta .btn{font-size:16px;padding:13px 34px}
+.cta{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta .btn{font-size:16px;padding:13px 32px}
 
-/* ---------- 地图 ---------- */
-.mapbox{
-  background:rgba(14,36,31,.85);border:1.5px solid var(--line);border-radius:22px;
-  padding:20px 18px;box-shadow:0 14px 40px rgba(0,0,0,.32);
-}
-.mapbox h2{margin:0 0 4px;font-size:19px;color:var(--cream)}
-.mapbox .hint{color:#8fbfae;font-size:13px;margin:0 0 18px}
-.track{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding:6px 2px 10px}
-.node{
-  flex:1 0 108px;min-width:108px;border-radius:16px;padding:12px 8px;
-  background:rgba(11,29,25,.6);border:1.5px solid #2b4a42;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  opacity:.42;transition:.18s;position:relative;
-}
-.node .ico{font-size:24px;line-height:1}
-.node .lbl{font-size:11.5px;font-weight:800;color:var(--pale);text-align:center;line-height:1.25}
-.node.done{opacity:.8;border-color:var(--mid2);background:rgba(49,83,75,.5)}
+/* 角色选择 */
+.chars{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:18px}
+.charpick{background:linear-gradient(180deg,rgba(20,48,42,.95),rgba(11,29,25,.95));
+  border:2px solid var(--line);border-radius:20px;padding:16px;cursor:pointer;transition:.18s;text-align:center}
+.charpick:hover{border-color:var(--teal);transform:translateY(-4px);box-shadow:0 14px 34px rgba(94,234,212,.18)}
+.charpick .face{width:92px;height:92px;border-radius:50%;overflow:hidden;margin:0 auto 10px;
+  border:2.5px solid var(--teal);background:#08110f}
+.charpick .face img{width:100%;height:100%;object-fit:cover}
+.charpick h3{margin:0 0 2px;font-size:16px;color:var(--cream)}
+.charpick .sp{font-size:11px;color:#7fae9e;font-style:italic;margin-bottom:8px}
+.charpick .sk{font-size:12px;color:var(--gold);font-weight:700;line-height:1.5;margin-bottom:6px}
+.charpick .hp{font-size:11.5px;color:#9dc9bb}
+
+/* 地图 */
+.mapbox{background:rgba(14,36,31,.86);border:1.5px solid var(--line);border-radius:22px;padding:20px 18px;
+  box-shadow:0 14px 40px rgba(0,0,0,.32)}
+.mapbox h2{margin:0 0 3px;font-size:18px;color:var(--cream)}
+.mapbox .hint{color:#8fbfae;font-size:12.5px;margin:0 0 16px}
+.track{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px}
+.node{flex:1 0 104px;min-width:104px;border-radius:16px;padding:11px 7px;background:rgba(11,29,25,.6);
+  border:1.5px solid #2b4a42;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.4;transition:.18s}
+.node .ico{font-size:22px;line-height:1}
+.node .lbl{font-size:11px;font-weight:800;color:var(--pale);text-align:center;line-height:1.25}
+.node.done{opacity:.78;border-color:var(--mid2);background:rgba(49,83,75,.5)}
 .node.done .lbl::after{content:" ✓";color:var(--teal)}
-.node.current{
-  opacity:1;border-color:var(--teal);background:linear-gradient(180deg,rgba(94,234,212,.2),rgba(11,29,25,.8));
+.node.current{opacity:1;border-color:var(--teal);
+  background:linear-gradient(180deg,rgba(94,234,212,.2),rgba(11,29,25,.8));
   box-shadow:0 0 0 3px rgba(94,234,212,.14),0 10px 24px rgba(94,234,212,.12);
-  transform:translateY(-3px);cursor:pointer;
-}
-.node.current:hover{box-shadow:0 0 0 4px rgba(94,234,212,.25),0 12px 28px rgba(94,234,212,.2)}
-.node.current .lbl{color:var(--cream)}
-.mapfoot{display:flex;justify-content:center;margin-top:8px}
+  transform:translateY(-3px);cursor:pointer}
 
-/* ---------- 战斗 ---------- */
-.arena{
-  display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;
-  background:linear-gradient(180deg,rgba(20,48,42,.72),rgba(11,29,25,.9));
-  border:1.5px solid var(--line);border-radius:22px;padding:18px;
-  box-shadow:0 14px 40px rgba(0,0,0,.32);margin-bottom:12px;position:relative;
-}
-.arena::after{
-  content:"";position:absolute;left:50%;top:14%;bottom:14%;width:1px;
-  background:linear-gradient(180deg,transparent,rgba(86,113,88,.6),transparent);
-}
-.fighter{display:flex;flex-direction:column;align-items:center;gap:9px}
-.portrait{
-  width:132px;height:132px;border-radius:22px;overflow:hidden;position:relative;
-  border:2.5px solid var(--mid2);box-shadow:0 10px 26px rgba(0,0,0,.42);
-  background:#08110f;
-}
-.portrait img{width:100%;height:100%;object-fit:cover;display:block}
-.fighter.enemy .portrait{border-color:#7a4f6e}
-.fighter.enemy .portrait::after{
-  content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px rgba(155,93,229,.22);
-}
+/* 战斗 */
+.arena{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;
+  background:linear-gradient(180deg,rgba(20,48,42,.72),rgba(11,29,25,.9));border:1.5px solid var(--line);
+  border-radius:22px;padding:16px;box-shadow:0 14px 40px rgba(0,0,0,.32);margin-bottom:10px;position:relative}
+.arena::after{content:"";position:absolute;left:50%;top:14%;bottom:14%;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(86,113,88,.6),transparent)}
+.fighter{display:flex;flex-direction:column;align-items:center;gap:8px}
+.portrait{width:118px;height:118px;border-radius:20px;overflow:hidden;position:relative;
+  border:2.5px solid var(--mid2);box-shadow:0 10px 26px rgba(0,0,0,.42);background:#08110f}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.fighter.enemy .portrait{border-color:#7a4f6e;box-shadow:inset 0 0 40px rgba(155,93,229,.22),0 10px 26px rgba(0,0,0,.42)}
 .portrait.hit{animation:shake .32s}
-@keyframes shake{
-  0%,100%{transform:translate(0,0)}
-  20%{transform:translate(-7px,2px) rotate(-2deg)}
-  50%{transform:translate(6px,-3px) rotate(2deg)}
-  80%{transform:translate(-3px,1px)}
-}
-.hpwrap{width:min(230px,100%);height:19px;border-radius:999px;background:#08110f;
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-7px,2px) rotate(-2deg)}
+  50%{transform:translate(6px,-3px) rotate(2deg)}80%{transform:translate(-3px,1px)}}
+.hpwrap{width:min(230px,100%);height:18px;border-radius:999px;background:#08110f;
   border:1.5px solid #24443c;overflow:hidden;position:relative}
-.hpfill{height:100%;width:100%;transition:width .3s cubic-bezier(.4,0,.2,1);
-  background:linear-gradient(90deg,#5eead4,#6ee7b7)}
+.hpfill{height:100%;transition:width .3s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,#5eead4,#6ee7b7)}
 .hpfill.foe{background:linear-gradient(90deg,#ff8b7b,#ffb4dc)}
-.hptext{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;
-  font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);letter-spacing:.4px}
-.fname{font-weight:900;font-size:14px;color:var(--cream);text-align:center}
-.fspecies{font-size:11px;color:#7fae9e;font-style:italic}
-.status{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;min-height:22px}
-.st{font-size:10.5px;font-weight:900;border-radius:999px;padding:2px 8px}
+.hptext{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:900;
+  color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+.fname{font-weight:900;font-size:13.5px;color:var(--cream);text-align:center}
+.fspecies{font-size:10.5px;color:#7fae9e;font-style:italic}
+.status{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:20px}
+.st{font-size:10px;font-weight:900;border-radius:999px;padding:2px 7px}
 .st.blk{background:rgba(120,220,255,.2);color:var(--cyan);border:1px solid rgba(120,220,255,.5)}
 .st.thr{background:rgba(255,180,220,.18);color:var(--pink);border:1px solid rgba(255,180,220,.45)}
 .st.psn{background:rgba(180,255,180,.16);color:#b4ffb4;border:1px solid rgba(180,255,180,.4)}
 .st.shk{background:rgba(254,240,138,.18);color:var(--gold);border:1px solid rgba(254,240,138,.45)}
-.intent{
-  background:rgba(11,29,25,.85);border:1.5px solid var(--pink);color:var(--pink);
-  border-radius:12px;padding:5px 12px;font-size:12.5px;font-weight:800;
-  box-shadow:0 4px 14px rgba(255,180,220,.12);text-align:center;
-}
+.st.vln{background:rgba(255,139,123,.18);color:var(--coral);border:1px solid rgba(255,139,123,.45)}
+.st.frz{background:rgba(190,230,255,.18);color:#bfe6ff;border:1px solid rgba(190,230,255,.45)}
+.st.buff{background:rgba(167,243,208,.16);color:var(--mint);border:1px solid rgba(167,243,208,.4)}
+.intent{background:rgba(11,29,25,.85);border:1.5px solid var(--pink);color:var(--pink);border-radius:12px;
+  padding:4px 11px;font-size:12px;font-weight:800;box-shadow:0 4px 14px rgba(255,180,220,.12);text-align:center}
+
+/* 技能 */
+.skillrow{display:flex;justify-content:center;margin:0 0 8px}
+.skillbtn{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#2b5f52,#1b3f37);
+  border:1.5px solid var(--teal);border-radius:14px;padding:7px 14px;cursor:pointer;transition:.15s;color:var(--pale)}
+.skillbtn:hover{border-color:var(--mint);box-shadow:0 0 0 3px rgba(94,234,212,.12)}
+.skillbtn.off{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+.skillbtn .snm{font-weight:900;font-size:12.5px;color:var(--mint)}
+.skillbtn .sds{font-size:11px;color:#9dc9bb}
+.skillbtn .cd{background:rgba(11,29,25,.7);border-radius:999px;padding:2px 8px;font-size:11px;
+  font-weight:900;color:var(--gold)}
 
 /* 手牌 */
-.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.energy{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(94,234,212,.14);border:1.5px solid var(--teal);border-radius:999px;
-  padding:7px 16px;font-weight:900;color:var(--mint);font-size:14px;
-}
-.piles{font-size:12.5px;color:#8fbfae}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.energy{display:inline-flex;align-items:center;gap:7px;background:rgba(94,234,212,.14);
+  border:1.5px solid var(--teal);border-radius:999px;padding:6px 15px;font-weight:900;color:var(--mint);font-size:13.5px}
+.piles{font-size:12px;color:#8fbfae}
 .piles b{color:var(--cream)}
-.log{
-  text-align:center;font-size:12.5px;color:#9dc9bb;min-height:18px;margin:2px 0 10px;
-  font-weight:600;
-}
-.hand{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:222px;padding:4px}
-.card{
-  width:142px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;
-  background:var(--cream);border:1.5px solid #d8d2c2;
-  box-shadow:0 6px 18px rgba(0,0,0,.32);
-  transition:transform .14s,box-shadow .14s;
-  display:flex;flex-direction:column;
-}
-.card:hover{transform:translateY(-12px);box-shadow:0 18px 34px rgba(0,0,0,.42)}
+.log{text-align:center;font-size:12.5px;color:#9dc9bb;min-height:18px;margin:2px 0 8px;font-weight:600}
+.hand{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;min-height:228px;padding:4px}
+
+/* 卡牌 */
+.card{width:146px;border-radius:15px;overflow:hidden;cursor:pointer;position:relative;background:var(--cream);
+  border:2px solid #d8d2c2;box-shadow:0 6px 18px rgba(0,0,0,.32);transition:transform .14s,box-shadow .14s;
+  display:flex;flex-direction:column}
+.card:hover{transform:translateY(-11px);box-shadow:0 18px 34px rgba(0,0,0,.42)}
 .card.dead{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
 .card.dead:hover{transform:none;box-shadow:0 6px 18px rgba(0,0,0,.32)}
 .card.hot{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,139,123,.4),0 8px 20px rgba(0,0,0,.35)}
-.card .img{height:88px;background:#0b1d19;overflow:hidden;position:relative}
+.card .img{height:84px;background:#0b1d19;overflow:hidden;position:relative}
 .card .img img{width:100%;height:100%;object-fit:cover;display:block}
-.card .cost{
-  position:absolute;top:6px;left:6px;width:25px;height:25px;border-radius:50%;
-  background:linear-gradient(180deg,#b9f8dd,#5eead4);color:#0b1d19;
-  display:grid;place-items:center;font-weight:900;font-size:13px;
-  box-shadow:0 2px 8px rgba(0,0,0,.5);border:1.5px solid #0b1d19;
-}
-.card .body{padding:7px 8px 9px;display:flex;flex-direction:column;gap:4px;flex:1}
-.card .nm{font-weight:900;font-size:12.5px;color:#182b26;line-height:1.2}
-.card .tp{
-  font-size:9.5px;font-weight:900;border-radius:5px;padding:1px 6px;
-  align-self:flex-start;letter-spacing:.3px;
-}
-.tp.bait{background:#ffe9b0;color:#6b4a00}
-.tp.shell{background:#c8e8ff;color:#08415f}
-.tp.pred{background:#ffd3cd;color:#7a1f12}
-.tp.bird{background:#e6d6ff;color:#3f2071}
-.tp.giant{background:#c6e4ff;color:#123a63}
-.tp.plant{background:#d4f5c4;color:#22520d}
-.card .ds{font-size:10.5px;line-height:1.35;color:#41524c;font-weight:600;flex:1}
+.card .img .fb{position:absolute;inset:0;display:grid;place-items:center;font-size:30px;
+  background:linear-gradient(135deg,#1d4238,#0b1d19)}
+.card .cost{position:absolute;top:5px;left:5px;width:24px;height:24px;border-radius:50%;
+  background:linear-gradient(180deg,#b9f8dd,#5eead4);color:#0b1d19;display:grid;place-items:center;
+  font-weight:900;font-size:12.5px;box-shadow:0 2px 8px rgba(0,0,0,.5);border:1.5px solid #0b1d19}
+.card .rar{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  border:1.5px solid rgba(0,0,0,.5)}
+.r-common .rar{background:#cfcabb}
+.r-uncommon .rar{background:#78dcff}
+.r-rare .rar{background:#dcb4ff}
+.r-legend .rar{background:#fef08a;box-shadow:0 0 8px #fef08a}
+.r-common{border-color:#d8d2c2}
+.r-uncommon{border-color:#78dcff}
+.r-rare{border-color:#dcb4ff}
+.r-legend{border-color:#fef08a;box-shadow:0 0 0 2px rgba(254,240,138,.28),0 6px 18px rgba(0,0,0,.32)}
+.card .body{padding:6px 7px 8px;display:flex;flex-direction:column;gap:3px;flex:1}
+.card .nm{font-weight:900;font-size:12px;color:#182b26;line-height:1.18}
+.card .tags{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+.card .ac{font-size:9px;font-weight:900;border-radius:4px;padding:1px 5px;color:#fff}
+.card .rr{font-size:8.5px;font-weight:900;border-radius:4px;padding:1px 4px;background:#eee8d8;color:#6b6455}
+.card .ds{font-size:10px;line-height:1.34;color:#41524c;font-weight:600;flex:1}
 
 /* 弹窗 */
-.mask{
-  position:fixed;inset:0;background:rgba(4,12,10,.86);backdrop-filter:blur(6px);
-  display:none;place-items:center;padding:16px;z-index:80;overflow-y:auto;
-}
+.mask{position:fixed;inset:0;background:rgba(4,12,10,.86);backdrop-filter:blur(6px);display:none;
+  place-items:center;padding:16px;z-index:80;overflow-y:auto}
 .mask.on{display:grid}
-.sheet{
-  width:100%;max-width:860px;background:linear-gradient(180deg,#14302a,#0e241f);
-  border:1.5px solid var(--line);border-radius:24px;padding:24px 20px;
-  box-shadow:0 26px 70px rgba(0,0,0,.6);text-align:center;max-height:90vh;overflow-y:auto;
-}
-.sheet h2{margin:0 0 6px;font-size:20px;color:var(--cream)}
-.sheet .lead{color:#9dc9bb;font-size:13.5px;margin:0 0 16px}
-.picks{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0 20px}
-.picks .card{width:150px}
+.sheet{width:100%;max-width:900px;background:linear-gradient(180deg,#14302a,#0e241f);
+  border:1.5px solid var(--line);border-radius:24px;padding:22px 18px;box-shadow:0 26px 70px rgba(0,0,0,.6);
+  text-align:center;max-height:90vh;overflow-y:auto}
+.sheet h2{margin:0 0 5px;font-size:19px;color:var(--cream)}
+.sheet .lead{color:#9dc9bb;font-size:13px;margin:0 0 14px}
+.picks{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin:14px 0 18px}
+.picks .card{width:152px}
 .picks .card:hover{transform:translateY(-8px) scale(1.02)}
-.notice{
-  background:rgba(254,240,138,.1);border:1px solid rgba(254,240,138,.35);
-  color:var(--gold);border-radius:12px;padding:8px 12px;font-size:13px;
-  font-weight:700;margin:0 0 12px;display:inline-block;
-}
-.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.notice{background:rgba(254,240,138,.1);border:1px solid rgba(254,240,138,.35);color:var(--gold);
+  border-radius:12px;padding:7px 12px;font-size:12.5px;font-weight:700;margin:0 0 10px;display:inline-block}
+.row{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
 .hide{display:none!important}
-.imgfallback{
-  width:100%;height:100%;display:grid;place-items:center;font-size:30px;
-  background:linear-gradient(135deg,#14302a,#0b1d19);
-}
-@media(max-width:640px){
-  .arena{grid-template-columns:1fr;gap:12px}
-  .arena::after{display:none}
-  .portrait{width:104px;height:104px}
-  .card{width:124px}
-  .card .img{height:76px}
-  .hero p{font-size:13.5px}
+.help{font-size:12px;color:#8fbfae;line-height:1.7;text-align:left;background:rgba(11,29,25,.5);
+  border-radius:14px;padding:12px 14px;margin:12px 0}
+.help b{color:var(--mint)}
+@media(max-width:680px){
+  .arena{grid-template-columns:1fr;gap:10px}.arena::after{display:none}
+  .portrait{width:96px;height:96px}.card{width:128px}.card .img{height:72px}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="topbar">
-    <span class="pill">🐙 <b>墨仔</b></span>
+    <span class="pill" id="ui-char">🐙 <b>—</b></span>
     <span class="pill" id="ui-hp">❤️ <b>65/65</b></span>
     <span class="pill" id="ui-gold">🪙 <b>50</b></span>
     <span class="pill" id="ui-act">🌊 <b>第1幕</b></span>
@@ -271,49 +219,47 @@ body::before{
     <button class="btn ghost sm" id="btn-mute" onclick="Audio.toggle()">🔊</button>
   </div>
 
-  <!-- 标题 -->
   <div id="scr-title" class="hero">
-    <div class="art"><img src="img/player.jpg" alt="拟态章鱼"></div>
+    <div class="art"><img src="img/dumbo.jpg" alt="小飞象章鱼" onerror="this.src='img/player.jpg'"></div>
     <h1>墨水与触手</h1>
     <div class="sub">DEEP SEA DECK</div>
-    <p>你是拟态小章鱼 <b>墨仔</b>。深海头足类霸主们正在争夺领地——<br>
-    用整片海洋的卡牌作战：0 费磷虾、带刺海胆、巨藻与珊瑚，<br>
-    以小鱼为饵，放出吞噬一切的虎鲸与大白鲨。</p>
+    <p>深海头足类霸主们正在争夺领地。<br>选择你的章鱼，用整片海洋的卡牌组出属于你的流派。</p>
     <div class="tagrow">
-      <span>三幕爬塔</span><span>27 种海洋卡牌</span><span>14 种头足类对手</span><span>食物链吞噬</span>
+      <span>12 大流派</span><span>120+ 张卡牌</span><span>4 级稀有度</span><span>14 种头足类对手</span><span>角色专属技能</span>
     </div>
-    <div class="cta">
-      <button class="btn" onclick="Game.newRun()">🌊 开始深海冒险</button>
-    </div>
+    <div class="chars" id="char-list"></div>
   </div>
 
-  <!-- 地图 -->
   <div id="scr-map" class="mapbox hide">
-    <h2 id="map-title">第 1 幕 · 浅海珊瑚礁</h2>
-    <p class="hint" id="map-hint">点击高亮的站点继续前进 →</p>
+    <h2 id="map-title">第 1 幕</h2>
+    <p class="hint">点击高亮的站点继续前进 →</p>
     <div class="track" id="map-track"></div>
-    <div class="mapfoot" id="map-foot"></div>
   </div>
 
-  <!-- 战斗 -->
   <div id="scr-battle" class="hide">
     <div class="arena">
       <div class="fighter">
         <div class="status" id="p-status"></div>
         <div class="portrait" id="p-art"><img src="img/player.jpg" alt=""></div>
-        <div class="hpwrap"><div class="hpfill" id="p-hpbar"></div><div class="hptext" id="p-hptext">65 / 65</div></div>
-        <div class="fname">拟态小章鱼 · 墨仔</div>
-        <div class="fspecies">Thaumoctopus mimicus</div>
+        <div class="hpwrap"><div class="hpfill" id="p-hpbar"></div><div class="hptext" id="p-hptext"></div></div>
+        <div class="fname" id="p-name">—</div>
+        <div class="fspecies" id="p-species"></div>
       </div>
       <div class="fighter enemy">
         <div class="intent" id="e-intent">意图：—</div>
         <div class="status" id="e-status"></div>
         <div class="portrait" id="e-art"><img src="img/sepiella.jpg" alt=""></div>
-        <div class="hpwrap"><div class="hpfill foe" id="e-hpbar"></div><div class="hptext" id="e-hptext">36 / 36</div></div>
-        <div class="fname" id="e-name">曼氏无针乌贼</div>
-        <div class="fspecies" id="e-species">Sepiella maindroni</div>
+        <div class="hpwrap"><div class="hpfill foe" id="e-hpbar"></div><div class="hptext" id="e-hptext"></div></div>
+        <div class="fname" id="e-name">—</div>
+        <div class="fspecies" id="e-species"></div>
       </div>
     </div>
+
+    <div class="skillrow"><div class="skillbtn" id="skill-btn" onclick="Game.useSkill()">
+      <span style="font-size:17px">✨</span>
+      <div style="text-align:left"><div class="snm" id="skill-name">技能</div><div class="sds" id="skill-desc"></div></div>
+      <span class="cd" id="skill-cd">就绪</span>
+    </div></div>
 
     <div class="log" id="log">战斗开始——出牌吧！</div>
 
@@ -328,114 +274,230 @@ body::before{
 </div>
 
 <div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
-
 <script>
-/* ============ 音效 ============ */
-const Audio = {
-  ctx:null, muted:false,
-  ensure(){ if(!this.ctx){ try{ this.ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } },
-  beep(f1,f2,dur,type,vol){
-    if(this.muted) return;
-    this.ensure(); if(!this.ctx) return;
-    if(this.ctx.state==='suspended') this.ctx.resume();
-    const t=this.ctx.currentTime, o=this.ctx.createOscillator(), g=this.ctx.createGain();
-    o.type=type||'sine';
-    o.frequency.setValueAtTime(f1,t);
-    o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+dur);
-    g.gain.setValueAtTime(vol||0.09,t);
-    g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(t); o.stop(t+dur+0.02);
-  },
-  card(){ this.beep(430,720,0.09,'sine',0.08); },
-  hit(){ this.beep(190,60,0.15,'triangle',0.16); },
-  eat(){ this.beep(150,420,0.13,'sawtooth',0.13); setTimeout(()=>this.beep(300,90,0.16,'sawtooth',0.11),90); },
-  win(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>this.beep(f,f*1.01,0.16,'sine',0.1),i*90)); },
-  heal(){ this.beep(520,880,0.18,'sine',0.09); },
-  toggle(){
-    this.muted=!this.muted; this.ensure(); if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume();
-    document.getElementById('btn-mute').textContent=this.muted?'🔇':'🔊';
-  }
+/* ================= 音效 ================= */
+const Audio={ctx:null,muted:false,
+  ensure(){if(!this.ctx){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}},
+  beep(f1,f2,d,type,v){if(this.muted)return;this.ensure();if(!this.ctx)return;
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    const t=this.ctx.currentTime,o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.type=type||'sine';o.frequency.setValueAtTime(f1,t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+    g.gain.setValueAtTime(v||.08,t);g.gain.exponentialRampToValueAtTime(.0008,t+d);
+    o.connect(g);g.connect(this.ctx.destination);o.start(t);o.stop(t+d+.02)},
+  card(){this.beep(430,720,.09,'sine',.07)},
+  hit(){this.beep(190,60,.15,'triangle',.14)},
+  eat(){this.beep(150,420,.12,'sawtooth',.12);setTimeout(()=>this.beep(300,90,.15,'sawtooth',.1),85)},
+  win(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>this.beep(f,f*1.01,.16,'sine',.09),i*85))},
+  heal(){this.beep(520,880,.17,'sine',.08)},
+  skill(){this.beep(700,1200,.15,'sine',.09)},
+  toggle(){this.muted=!this.muted;this.ensure();
+    if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();
+    document.getElementById('btn-mute').textContent=this.muted?'🔇':'🔊'}
 };
 
-/* ============ 卡牌库 ============ */
-const CARDS = {
-  krill:{n:'南极磷虾',c:0,t:'bait',img:'krill',d:'造成 3 点伤害，抽 1 张牌。可被吞噬。',
-    f:g=>{g.hitEnemy(3);g.draw(1)}},
-  sandworm:{n:'沙蚕',c:0,t:'bait',img:'sandworm',d:'获得 3 护甲，造成 2 点伤害。可被吞噬。',
-    f:g=>{g.block(3);g.hitEnemy(2)}},
-  searoach:{n:'海蟑螂',c:0,t:'bait',img:'searoach',d:'造成 4 点伤害。可被吞噬。',
-    f:g=>{g.hitEnemy(4)}},
-  barnacle:{n:'藤壶群',c:0,t:'bait',img:'barnacle',d:'获得 4 护甲。可被吞噬。',
-    f:g=>{g.block(4)}},
-  seabutterfly:{n:'海蝴蝶',c:0,t:'bait',img:'seabutterfly',d:'下回合额外 +1 洋流。可被吞噬。',
-    f:g=>{g.s.nextEnergy+=1}},
-  clownfish:{n:'小丑鱼',c:1,t:'bait',img:'clownfish',d:'造成 5 点伤害，抽 1 张牌。可被吞噬。',
-    f:g=>{g.hitEnemy(5);g.draw(1)}},
-
-  hermit:{n:'寄居蟹',c:1,t:'shell',img:'hermit',d:'获得 6 点护甲。',f:g=>{g.block(6)}},
-  urchin:{n:'紫海胆',c:1,t:'shell',img:'urchin',d:'获得 5 护甲，获得 3 层荆棘（反伤）。',
-    f:g=>{g.block(5);g.s.p.thorns+=3}},
-  lobster:{n:'波士顿龙虾',c:1,t:'shell',img:'lobster',d:'造成 6 点伤害，获得 5 护甲。',
-    f:g=>{g.hitEnemy(6);g.block(5)}},
-  kingcrab:{n:'帝王蟹',c:2,t:'shell',img:'kingcrab',d:'获得 13 点护甲，造成 6 点伤害。',
-    f:g=>{g.block(13);g.hitEnemy(6)}},
-  turtle:{n:'绿海龟',c:2,t:'shell',img:'turtle',d:'获得 15 点护甲，抽 1 张牌。',
-    f:g=>{g.block(15);g.draw(1)}},
-
-  shark:{n:'大白鲨',c:2,t:'pred',img:'shark',eat:true,
-    d:'造成 14 点伤害。【吞噬】手牌中 1 张饵料：伤害翻倍为 28。',
-    f:(g,e)=>{g.hitEnemy(e?28:14)}},
-  orca:{n:'虎鲸',c:3,t:'pred',img:'orca',eat:true,
-    d:'造成 20 点伤害。【吞噬】饵料：费用 -1 且伤害 34。',
-    f:(g,e)=>{g.hitEnemy(e?34:20)}},
-  eel:{n:'电鳗',c:1,t:'pred',img:'eel',d:'造成 7 点伤害，施加 2 层麻痹（敌方伤害 -25%）。',
-    f:g=>{g.hitEnemy(7);g.s.e.shock+=2}},
-  swordfish:{n:'剑鱼',c:1,t:'pred',img:'swordfish',d:'无视护甲，造成 9 点穿刺伤害。',
-    f:g=>{g.hitEnemy(9,true)}},
-  seasnake:{n:'阔带青环海蛇',c:1,t:'pred',img:'seasnake',d:'造成 4 点伤害，施加 5 层剧毒。',
-    f:g=>{g.hitEnemy(4);g.s.e.poison+=5}},
-  puffer:{n:'刺豚',c:1,t:'pred',img:'puffer',d:'造成 5 点伤害，获得 4 层荆棘。',
-    f:g=>{g.hitEnemy(5);g.s.p.thorns+=4}},
-
-  seagull:{n:'贼鸥',c:1,t:'bird',img:'seagull',d:'无视护甲造成 6 点伤害，偷 8 金币，抽 1 张牌。',
-    f:g=>{g.hitEnemy(6,true);g.s.gold+=8;g.draw(1)}},
-  albatross:{n:'信天翁',c:1,t:'bird',img:'albatross',d:'抽 3 张牌。',
-    f:g=>{g.draw(3)}},
-  penguin:{n:'帝企鹅',c:2,t:'bird',img:'penguin',d:'造成 10 点伤害，获得 8 护甲，施加 1 层麻痹。',
-    f:g=>{g.hitEnemy(10);g.block(8);g.s.e.shock+=1}},
-
-  dolphin:{n:'瓶鼻海豚',c:1,t:'giant',img:'dolphin',d:'抽 2 张牌，获得 1 点洋流。',
-    f:g=>{g.draw(2);g.s.energy+=1}},
-  whale:{n:'蓝鲸',c:2,t:'giant',img:'whale',d:'获得 14 护甲，恢复 6 点生命。',
-    f:g=>{g.block(14);g.heal(6)}},
-  seal:{n:'海豹',c:1,t:'giant',img:'seal',d:'造成 7 点伤害，获得 7 点护甲。',
-    f:g=>{g.hitEnemy(7);g.block(7)}},
-
-  kelp:{n:'巨藻海带',c:1,t:'plant',img:'kelp',d:'获得 6 护甲，施加 2 层麻痹，抽 1 张牌。',
-    f:g=>{g.block(6);g.s.e.shock+=2;g.draw(1)}},
-  coral:{n:'红珊瑚',c:1,t:'plant',img:'coral',d:'获得 9 点护甲，恢复 3 点生命。',
-    f:g=>{g.block(9);g.heal(3)}},
-  anemone:{n:'荧光海葵',c:0,t:'plant',img:'anemone',d:'将 2 张 0 费【南极磷虾】加入手牌。',
-    f:g=>{g.toHand('krill');g.toHand('krill')}},
-  seagrass:{n:'海草床',c:1,t:'plant',img:'seagrass',d:'恢复 5 点生命，抽 2 张牌。',
-    f:g=>{g.heal(5);g.draw(2)}}
+/* ================= 流派 ================= */
+const ARCH={
+  devour:{n:'吞噬链',c:'#ff8b7b',d:'小鱼小虾当饵料，喂给掠食者爆发'},
+  shell :{n:'甲壳壁垒',c:'#78dcff',d:'厚甲与荆棘，越挨打越硬'},
+  venom :{n:'剧毒',c:'#b4ffb4',d:'层层毒素，回合结束持续掉血'},
+  current:{n:'洋流',c:'#5eead4',d:'攒能量、狂抽牌，打大牌'},
+  swarm :{n:'虫群',c:'#ffca3a',d:'0 费小虫铺场，层数越高越强'},
+  mimic :{n:'拟态',c:'#dcb4ff',d:'复制、镜像、变形成对手'},
+  ink   :{n:'墨汁',c:'#9a84e6',d:'削弱敌人伤害，控场消耗'},
+  lumen :{n:'生物发光',c:'#fef08a',d:'发光层数驱动爆发伤害'},
+  cryo  :{n:'极寒',c:'#bfe6ff',d:'冻住对手，削平每次攻击'},
+  symbio:{n:'共生珊瑚',c:'#a7f3d0',d:'回血、成长，越拖越强'},
+  tide  :{n:'潮汐',c:'#7fd1e8',d:'涨潮退潮交替，节奏爆发'},
+  volt  :{n:'电击',c:'#ffe066',d:'麻痹连锁，敌人伤害大打折'}
 };
-const TTYPE = {bait:'饵料',shell:'甲壳',pred:'掠食者',bird:'海鸟',giant:'巨兽',plant:'海洋植物'};
+const RAR={c:{n:'普通',w:60},u:{n:'精良',w:26},r:{n:'稀有',w:11},l:{n:'传说',w:3}};
 
-/* ============ 遗物 ============ */
-const RELICS = {
-  hook:{i:'🪝',n:'生锈的鱼钩',d:'每场战斗第一张【掠食者】牌额外 +6 伤害'},
-  pearl:{i:'🫧',n:'发光的珍珠',d:'每打出 1 张【海洋植物】，恢复 3 点生命'},
+/* ================= 卡牌库 ================= */
+const CARDS={};
+function def(id,n,cost,a,r,img,d,f){CARDS[id]={id,n,c:cost,a,r,img,d,f};}
+
+/* ---- 1 吞噬链 ---- */
+def('krill','南极磷虾',0,'devour','c','krill','造成 3 伤害，抽 1 张。【饵料】',g=>{g.hit(3);g.draw(1)});
+def('sandworm','沙蚕',0,'devour','c','sandworm','获得 3 护甲，造成 2 伤害。【饵料】',g=>{g.block(3);g.hit(2)});
+def('sardine','沙丁鱼群',1,'devour','c','sardine','造成 6 伤害。【饵料】',g=>{g.hit(6)});
+def('clownfish','小丑鱼',1,'devour','c','clownfish','造成 5 伤害，抽 1 张。【饵料】',g=>{g.hit(5);g.draw(1)});
+def('mackerel','大西洋鲭',1,'devour','u','mackerel','造成 8 伤害。若手牌有【饵料】，额外 3 伤害。',(g,c)=>{g.hit(8+(g.hasBait()?3:0))});
+def('shark','大白鲨',2,'devour','u','shark','造成 10 伤害。【吞噬】1 张饵料：改为 18 伤害。',(g,c)=>{g.hit(c.ate?18:10)});
+def('orca','虎鲸',3,'devour','r','orca','造成 15 伤害。【吞噬】：改为 24 伤害并获得 6 护甲。',(g,c)=>{g.hit(c.ate?24:15);if(c.ate)g.block(6)});
+def('barracuda','梭子鱼',1,'devour','u','barracuda','造成 7 伤害。【吞噬】：抽 2 张牌。',(g,c)=>{g.hit(7);if(c.ate)g.draw(2)});
+def('tuna','蓝鳍金枪鱼',2,'devour','r','tuna','造成 12 伤害。本场每吞噬过 1 张，伤害 +3。',g=>{g.hit(12+3*g.s.ateCount)});
+def('moray','海鳝',1,'devour','u','moray','造成 7 伤害，施加 2 层剧毒。',g=>{g.hit(7);g.psn(2)});
+
+/* ---- 2 甲壳壁垒 ---- */
+def('barnacle','藤壶群',0,'shell','c','barnacle','获得 4 护甲。',g=>g.block(4));
+def('hermit','寄居蟹',1,'shell','c','hermit','获得 6 护甲。',g=>g.block(6));
+def('urchin','紫海胆',1,'shell','c','urchin','获得 5 护甲，获得 3 层荆棘。',g=>{g.block(5);g.thr(3)});
+def('lobster','波士顿龙虾',1,'shell','c','lobster','造成 6 伤害，获得 5 护甲。',g=>{g.hit(6);g.block(5)});
+def('kingcrab','帝王蟹',2,'shell','u','kingcrab','获得 13 护甲，造成 6 伤害。',g=>{g.block(13);g.hit(6)});
+def('turtle','绿海龟',2,'shell','u','turtle','获得 15 护甲，抽 1 张牌。',g=>{g.block(15);g.draw(1)});
+def('crab','黄道蟹',1,'shell','u','crab','获得 8 护甲。若本回合未受伤，再获得 5 护甲。',g=>{g.block(8+(g.s.p.block>0?5:0))});
+def('horseshoe','鲎',2,'shell','r','horseshoe','获得 12 护甲，回合结束护甲不清空。',g=>{g.block(12);g.s.keepBlock=true});
+def('giantclam','巨砗磲',3,'shell','r','giantclam','获得 20 护甲，获得 6 层荆棘。',g=>{g.block(20);g.thr(6)});
+def('abalone','鲍鱼',1,'shell','u','abalone','获得 7 护甲，抽 1 张牌。',g=>{g.block(7);g.draw(1)});
+
+/* ---- 3 剧毒 ---- */
+def('nudibranch','大西洋海神蛞蝓',0,'venom','c','nudibranch','施加 2 层剧毒。',g=>g.psn(2));
+def('seasnake','阔带青环海蛇',1,'venom','c','seasnake','造成 4 伤害，施加 4 层剧毒。',g=>{g.hit(4);g.psn(4)});
+def('puffer','刺豚',1,'venom','c','puffer','造成 5 伤害，获得 3 层荆棘。',g=>{g.hit(5);g.thr(3)});
+def('lionfish','狮子鱼',1,'venom','u','lionfish','造成 6 伤害，施加 3 层剧毒。',g=>{g.hit(6);g.psn(3)});
+def('stonefish','石头鱼',2,'venom','u','stonefish','造成 8 伤害，施加 6 层剧毒。',g=>{g.hit(8);g.psn(6)});
+def('cone','芋螺',1,'venom','u','conesnail','施加 3 层剧毒，抽 1 张牌。',g=>{g.psn(3);g.draw(1)});
+def('manowar','僧帽水母',2,'venom','u','manowar','施加 7 层剧毒，获得 6 护甲。',g=>{g.psn(7);g.block(6)});
+def('boxjelly','箱水母',2,'venom','r','boxjelly','施加 12 层剧毒。',g=>g.psn(12));
+def('blueringcard','蓝环之触',3,'venom','r','bluering','施加 9 层剧毒；若敌人已有剧毒，改为 18 层。',g=>{g.psn(g.s.e.poison>0?18:9)});
+def('toxicbloom','毒素爆发',1,'venom','r','anemone','立即结算一次敌方剧毒伤害（不减少层数）。',g=>{g.hit(g.s.e.poison,true);g.log('毒素爆发！')});
+
+/* ---- 4 洋流 ---- */
+def('flyingfish','飞鱼',0,'current','c','flyingfish','造成 3 伤害，下回合 +1 洋流。',g=>{g.hit(3);g.s.nextEnergy+=1});
+def('dolphin','瓶鼻海豚',1,'current','c','dolphin','抽 2 张牌，获得 1 点洋流。',g=>{g.draw(2);g.gain(1)});
+def('albatross','信天翁',1,'current','c','albatross','抽 3 张牌。',g=>g.draw(3));
+def('kelp','巨藻海带',1,'current','c','kelp','获得 6 护甲，施加 2 层麻痹，抽 1 张牌。',g=>{g.block(6);g.shk(2);g.draw(1)});
+def('moonjelly','海月水母',1,'current','u','moonjelly','获得 2 点洋流，抽 1 张牌。',g=>{g.gain(2);g.draw(1)});
+def('sunfish','翻车鱼',2,'current','u','sunfish','获得 8 护甲，获得 1 点洋流。',g=>{g.block(8);g.gain(1)});
+def('sailfish','旗鱼',2,'current','u','sailfish','造成 10 伤害，获得 1 点洋流。',g=>{g.hit(10);g.gain(1)});
+def('manta','蝠鲼',2,'current','r','manta','抽 2 张牌，获得 2 点洋流。',g=>{g.draw(2);g.gain(2)});
+def('whaleshark','鲸鲨',3,'current','r','whaleshark','造成 14 伤害，抽 3 张牌。',g=>{g.hit(14);g.draw(3)});
+def('surge','洋流涌动',2,'current','l','seagrass','本回合获得 3 点洋流，抽 1 张牌。',g=>{g.gain(3);g.draw(1)});
+
+/* ---- 5 虫群 ---- */
+def('searoach','海蟑螂',0,'swarm','c','searoach','造成 4 伤害。',g=>g.hit(4));
+def('seabutterfly','海蝴蝶',0,'swarm','c','seabutterfly','下回合 +1 洋流。',g=>{g.s.nextEnergy+=1});
+def('copepod','桡足类',0,'swarm','c','copepod','造成 2 伤害，虫群 +1 层。',g=>{g.hit(2);g.buff('swarm',1)});
+def('brineshrimp','丰年虾',0,'swarm','c','brineshrimp','造成 2 伤害，抽 1 张牌。',g=>{g.hit(2);g.draw(1)});
+def('daphnia','水蚤',0,'swarm','u','daphnia','获得 3 护甲，虫群 +1 层。',g=>{g.block(3);g.buff('swarm',1)});
+def('amphipod','端足类',0,'swarm','u','amphipod','造成 3 伤害，虫群 +1 层。',g=>{g.hit(3);g.buff('swarm',1)});
+def('seaspider','海蜘蛛',1,'swarm','u','seaspider','造成 3×虫群层数 的伤害（至少 3）。',g=>{g.hit(Math.max(3,3*g.buff('swarm',0)))});
+def('lancelet','文昌鱼',1,'swarm','c','lancelet','造成 6 伤害，抽 1 张牌。',g=>{g.hit(6);g.draw(1)});
+def('isopod','巨型等足虫',2,'swarm','r','isopod','造成 8 伤害，每层虫群额外 +2 伤害。',g=>{g.hit(8+2*g.buff('swarm',0))});
+def('swarmtide','虫潮',3,'swarm','l','krill','造成 5×虫群层数 的伤害。',g=>{g.hit(5*Math.max(1,g.buff('swarm',0)))});
+
+/* ---- 6 拟态 ---- */
+def('cuttlefish','乌贼',1,'mimic','c','cuttlefish','造成 5 伤害，随机复制 1 张手牌（0 费）。',g=>{g.hit(5);g.mimicHand()});
+def('bobtail','短尾乌贼',1,'mimic','c','bobtail','获得 6 护甲，抽 1 张牌。',g=>{g.block(6);g.draw(1)});
+def('filefish','拟态鲹',1,'mimic','u','filefish','造成 4 伤害，获得 4 护甲，复制 1 张手牌。',g=>{g.hit(4);g.block(4);g.mimicHand()});
+def('seadragon','草海龙',1,'mimic','u','seadragon','获得 9 护甲，复制手牌中 1 张防御类牌。',g=>{g.block(9);g.mimicHand()});
+def('wonderpus','奇异拟态章鱼',2,'mimic','u','wonderpus','复制手牌中全部 0 费牌。',g=>{g.mimicZero()});
+def('octopus','普通章鱼',2,'mimic','r','octopus','复制本场最后打出的一张牌（0 费）。',g=>{g.replayLast()});
+def('stanceturn','拟态姿态',0,'mimic','u','player','本回合下一张牌费用 -1。',g=>{g.s.costDown=(g.s.costDown||0)+1});
+def('mirrorink','镜像墨汁',1,'mimic','r','sepiella','从弃牌堆随机取 1 张加入手牌。',g=>{g.recall()});
+def('twin','双生触手',2,'mimic','r','shortocto','复制手牌中 1 张牌，费用变为 0。',g=>{g.mimicHand(true)});
+def('mimicmaster','拟态大师',3,'mimic','l','player','复制本场最后打出的 3 张牌到手牌（0 费）。',g=>{g.replayLast(3)});
+
+/* ---- 7 墨汁 ---- */
+def('inkjet','墨汁喷射',0,'ink','c','sepiella','施加 3 层麻痹。',g=>g.shk(3));
+def('shortocto2','短蛸突袭',1,'ink','c','shortocto','造成 6 伤害，施加 2 层麻痹。',g=>{g.hit(6);g.shk(2)});
+def('flamboyant2','火焰乌贼',1,'ink','u','flamboyant','造成 8 伤害，施加 2 层剧毒。',g=>{g.hit(8);g.psn(2)});
+def('inkveil','黑水帷幕',1,'ink','u','vampire','获得 10 护甲，施加 2 层麻痹。',g=>{g.block(10);g.shk(2)});
+def('vampire2','幽灵蛸吸噬',2,'ink','u','vampire','造成 8 伤害，恢复 5 点生命。',g=>{g.hit(8);g.heal(5)});
+def('nautiluscard','鹦鹉螺壳',2,'ink','u','nautilus','获得 12 护甲，抽 1 张牌。',g=>{g.block(12);g.draw(1)});
+def('architeuthis2','大王乌贼之腕',3,'ink','r','architeuthis','造成 18 伤害，施加 3 层麻痹。',g=>{g.hit(18);g.shk(3)});
+def('fog','深海迷雾',2,'ink','r','glass','施加强麻痹：本场敌人伤害 -20%。',g=>{g.s.fog=(g.s.fog||0)+20;g.log('深海迷雾笼罩')});
+def('inkstain','墨染',1,'ink','r','coral','造成 5 伤害，施加 3 层易伤。',g=>{g.hit(5);g.vln(3)});
+def('abysshush','深渊寂静',3,'ink','l','blind','敌人本回合不行动，并施加 5 层麻痹。',g=>{g.s.skipEnemy=true;g.shk(5)});
+
+/* ---- 8 生物发光 ---- */
+def('noctiluca','夜光虫',0,'lumen','c','noctiluca','发光 +1 层，抽 1 张牌。',g=>{g.buff('glow',1);g.draw(1)});
+def('lanternfish','灯笼鱼',1,'lumen','c','lanternfish','造成 6 伤害，抽 1 张牌。',g=>{g.hit(6);g.draw(1)});
+def('fireflysquid','萤火鱿',1,'lumen','c','fireflysquid','造成 5 伤害，发光 +1 层。',g=>{g.hit(5);g.buff('glow',1)});
+def('combjelly','栉水母',1,'lumen','u','combjelly','获得 4 护甲，发光 +1 层。',g=>{g.block(4);g.buff('glow',1)});
+def('flashlight','灯眼鱼',1,'lumen','u','flashlightfish','造成 4 伤害，每层发光额外 +2 伤害。',g=>{g.hit(4+2*g.buff('glow',0))});
+def('anglerfish','鮟鱇鱼',2,'lumen','u','anglerfish','造成 10 伤害，施加 2 层易伤。',g=>{g.hit(10);g.vln(2)});
+def('glowtendril','极光触须',1,'lumen','u','anemone','获得 6 护甲，发光 +1 层。',g=>{g.block(6);g.buff('glow',1)});
+def('lumenburst','幽光爆发',2,'lumen','r','fireflysquid','造成 3×发光层数 的伤害。',g=>{g.hit(3*Math.max(1,g.buff('glow',0)))});
+def('deepglow','深海明灯',2,'lumen','r','lanternfish','发光 +3 层，抽 2 张牌。',g=>{g.buff('glow',3);g.draw(2)});
+def('brilliant','璀璨深渊',3,'lumen','l','combjelly','发光层数翻倍，恢复「发光层数×2」生命。',g=>{const gl=g.buff('glow',0);g.buff('glow',gl);g.heal(gl*2)});
+
+/* ---- 9 极寒 ---- */
+def('icefish','冰鱼',1,'cryo','c','icefish','造成 6 伤害，施加 1 层冻结。',g=>{g.hit(6);g.frz(1)});
+def('seapig','深海猪',1,'cryo','c','seapig','获得 5 护甲，抽 1 张牌。',g=>{g.block(5);g.draw(1)});
+def('coldcurrent','寒流',0,'cryo','c','icefish','施加 2 层冻结。',g=>g.frz(2));
+def('glass2','玻璃乌贼',1,'cryo','u','glass','获得 8 护甲，施加 1 层冻结。',g=>{g.block(8);g.frz(1)});
+def('toothfish','南极犬牙鱼',2,'cryo','u','toothfish','造成 10 伤害，施加 2 层冻结。',g=>{g.hit(10);g.frz(2)});
+def('icewall','极地冰盾',2,'cryo','u','giantclam','获得 14 护甲，施加 2 层冻结。',g=>{g.block(14);g.frz(2)});
+def('blind2','盲眼深海蛸',2,'cryo','u','blind','造成 9 伤害，施加 2 层冻结。',g=>{g.hit(9);g.frz(2)});
+def('greenland','格陵兰鲨',3,'cryo','r','greenlandshark','造成 16 伤害，施加 3 层冻结。',g=>{g.hit(16);g.frz(3)});
+def('permafrost','永冻之触',2,'cryo','r','icefish','敌人下回合不行动。',g=>{g.s.skipEnemy=true;g.log('永冻！敌人被冻结')});
+def('zeropoint','深渊零点',3,'cryo','l','colossal','本场敌人伤害 -50%。',g=>{g.s.frozenHalf=true;g.log('深渊零点降临')});
+
+/* ---- 10 共生珊瑚 ---- */
+def('sponge','海绵',1,'symbio','c','sponge','获得 6 护甲，恢复 2 点生命。',g=>{g.block(6);g.heal(2)});
+def('coral','红珊瑚',1,'symbio','c','coral','获得 9 护甲，恢复 3 点生命。',g=>{g.block(9);g.heal(3)});
+def('seagrass','海草床',1,'symbio','c','seagrass','恢复 5 点生命，抽 2 张牌。',g=>{g.heal(5);g.draw(2)});
+def('zoox','虫黄藻',0,'symbio','c','zoox','成长 +1 层。',g=>g.buff('growth',1));
+def('seafan','海扇',1,'symbio','u','seafan','成长 +1 层，获得 4 护甲。',g=>{g.buff('growth',1);g.block(4)});
+def('tubeworm','巨型管虫',2,'symbio','u','tubeworm','恢复 6 点生命，获得 8 护甲。',g=>{g.heal(6);g.block(8)});
+def('reef','珊瑚礁',2,'symbio','u','coral','获得 10 护甲，成长 +1 层。',g=>{g.block(10);g.buff('growth',1)});
+def('mangrove','红树林',2,'symbio','r','mangrove','成长 +2 层，恢复 4 点生命。',g=>{g.buff('growth',2);g.heal(4)});
+def('ecoecho','生态共鸣',3,'symbio','r','seafan','恢复「5×成长层数」生命，获得等量护甲。',g=>{const gr=g.buff('growth',0);g.heal(5*gr);g.block(5*gr)});
+def('symbiowing','共生之环',3,'symbio','l','anemone','成长层数翻倍，本场每回合结束获得成长×2 护甲。',g=>{const gr=g.buff('growth',0);g.buff('growth',gr);g.s.growthBlock=true});
+
+/* ---- 11 潮汐 ---- */
+def('tidepool','潮池',0,'tide','c','limpet','获得 4 护甲。',g=>g.block(4));
+def('sanddollar','沙钱',1,'tide','c','sandle','造成 5 伤害，获得 5 护甲。',g=>{g.hit(5);g.block(5)});
+def('moonsnail','玉螺',1,'tide','c','moonsnail','造成 7 伤害。',g=>g.hit(7));
+def('grunion','加州滑银汉鱼',0,'tide','u','grunion','涨潮时造成 9 伤害。',g=>{g.hit(g.s.tide?9:4)});
+def('tidecall','唤潮',1,'tide','u','moonjelly','切换潮汐状态；涨潮时抽 2 张牌。',g=>{g.s.tide=!g.s.tide;if(g.s.tide)g.draw(2);g.log(g.s.tide?'涨潮！':'退潮…')});
+def('surf','浪涌',2,'tide','u','manta','造成 9 伤害，若是涨潮则翻倍。',g=>{g.hit(g.s.tide?18:9)});
+def('lowtide','退潮护壳',2,'tide','u','turtle','获得 12 护甲，若是退潮则改为 20。',g=>{g.block(g.s.tide?12:20)});
+def('tsunami','海啸',3,'tide','r','whaleshark','造成 20 伤害，切换潮汐。',g=>{g.hit(20);g.s.tide=!g.s.tide});
+def('tidefull','满潮',2,'tide','r','flyingfish','立即进入涨潮，获得 2 点洋流。',g=>{g.s.tide=true;g.gain(2)});
+def('tideheart','潮心',3,'tide','l','seasnake','本场每次涨潮，额外造成 6 点伤害。',g=>{g.s.tideBonus=(g.s.tideBonus||0)+6;g.log('潮心共鸣')});
+
+/* ---- 12 电击 ---- */
+def('static','静电',0,'volt','c','eel','施加 1 层麻痹。',g=>g.shk(1));
+def('electricray','电鳐',1,'volt','c','electricray','造成 6 伤害，施加 1 层麻痹。',g=>{g.hit(6);g.shk(1)});
+def('eel2','电鳗',1,'volt','u','eel','造成 7 伤害，施加 2 层麻痹。',g=>{g.hit(7);g.shk(2)});
+def('stargazer','瞻星鱼',1,'volt','u','stargazer','造成 5 伤害，每层麻痹额外 +2 伤害。',g=>{g.hit(5+2*g.s.e.shock)});
+def('voltchain','电链',2,'volt','u','electriccatfish','造成 4×麻痹层数 的伤害。',g=>{g.hit(4*Math.max(1,g.s.e.shock))});
+def('shockwave','冲击波',2,'volt','u','boxjelly','施加 3 层麻痹，抽 1 张牌。',g=>{g.shk(3);g.draw(1)});
+def('paralyze','瘫痪',2,'volt','r','stargazer','敌人下回合伤害减半（叠加）。',g=>{g.s.paralyze=(g.s.paralyze||0)+50;g.log('敌人瘫痪了')});
+def('thunder','雷暴',3,'volt','r','electriccatfish','造成 10 伤害，施加 4 层麻痹。',g=>{g.hit(10);g.shk(4)});
+def('voltcore','电核',2,'volt','r','electricray','本场每层麻痹使你的攻击 +1 伤害。',g=>{g.s.voltPower=true;g.log('电核充能')});
+def('storm','深海风暴',3,'volt','l','stargazer','造成 8×麻痹层数 的伤害，然后清空麻痹。',g=>{g.hit(8*Math.max(1,g.s.e.shock));g.s.e.shock=0});
+
+/* ================= 遗物 ================= */
+const RELICS={
+  hook:{i:'🪝',n:'生锈的鱼钩',d:'每场战斗第一张【掠食者】牌 +6 伤害'},
+  pearl:{i:'🫧',n:'发光的珍珠',d:'每打出 1 张【共生珊瑚】牌，恢复 3 生命'},
   sonar:{i:'📡',n:'破损的声呐',d:'每次【吞噬】额外抽 1 张牌'},
   rum:{i:'🍾',n:'沉船朗姆酒',d:'每回合洋流上限 +1'},
-  plastic:{i:'🧪',n:'塑料微粒',d:'所有 0 费卡牌额外造成 3 点伤害'},
-  vent:{i:'🪨',n:'深海热泉石',d:'每场战斗开始获得 8 点护甲'},
-  tooth:{i:'🦷',n:'巨齿鲨牙',d:'每次战斗胜利，最大生命 +4'}
+  plastic:{i:'🧪',n:'塑料微粒',d:'所有 0 费牌额外造成 3 伤害'},
+  vent:{i:'🪨',n:'深海热泉石',d:'每场战斗开始获得 8 护甲'},
+  tooth:{i:'🦷',n:'巨齿鲨牙',d:'每次战斗胜利，最大生命 +4'},
+  lens:{i:'🔍',n:'深海放大镜',d:'每次抽牌堆洗牌，抽 1 张牌'},
+  shell:{i:'🐚',n:'初生螺壳',d:'每回合开始获得 3 护甲'},
+  ink:{i:'🖋',n:'墨囊',d:'每场战斗开始，敌人获得 3 层麻痹'},
+  pearl2:{i:'⚪',n:'夜明珠',d:'每回合第一次出牌，洋流 +1'},
+  fang:{i:'🦑',n:'触手倒刺',d:'【吞噬】时敌人额外受 5 伤害'}
 };
 
-/* ============ 头足类对手 ============ */
-const FOES = {
+/* ================= 角色 ================= */
+const CHARS={
+  dumbo:{key:'dumbo',n:'小飞象章鱼',sp:'Grimpoteuthis',img:'dumbo',hp:62,
+    skill:{n:'洋流涌动',d:'被动：每回合洋流 +1',type:'passive',cd:0},
+    deck:['krill','krill','sandworm','sandworm','hermit','hermit','sardine','dolphin','kelp','sponge'],
+    relic:'shell',
+    desc:'起点角色。天赋让洋流更充沛，什么流派都能搭。'},
+  mimic:{key:'mimic',n:'拟态章鱼',sp:'Thaumoctopus mimicus',img:'player',hp:58,
+    skill:{n:'拟态复制',d:'复制手牌中随机 1 张牌（0 费）',type:'active',cd:3},
+    deck:['cuttlefish','cuttlefish','bobtail','bobtail','wonderpus','filefish','mirrorink','krill','hermit','urchin'],
+    relic:'sonar',
+    desc:'复制、镜像、回响——把一手牌变成两倍。'},
+  bluering:{key:'bluering',n:'蓝环章鱼',sp:'Hapalochlaena lunulata',img:'bluering',hp:55,
+    skill:{n:'剧毒腺',d:'施加 3 层剧毒',type:'active',cd:2},
+    deck:['nudibranch','nudibranch','seasnake','seasnake','cone','manowar','lionfish','krill','hermit','cuttlefish'],
+    relic:'ink',
+    desc:'把毒素层层堆上去，让敌人自己烂掉。'}
+};
+
+/* ================= 对手 ================= */
+const FOES={
   sepiella:{n:'曼氏无针乌贼',s:'Sepiella maindroni',hp:36,act:1,img:'sepiella',
     it:[{k:'atk',v:7,t:'墨汁突刺'},{k:'blk',v:6,t:'缩壳'},{k:'atk',v:9,t:'触手抽打'}]},
   shortocto:{n:'短蛸',s:'Amphioctopus fangsiao',hp:34,act:1,img:'shortocto',
@@ -446,7 +508,6 @@ const FOES = {
     it:[{k:'blk',v:12,t:'硬壳闭合'},{k:'atk',v:11,t:'螺壳撞击'}]},
   bluering:{n:'蓝环章鱼',s:'Hapalochlaena lunulata',hp:80,act:1,boss:true,img:'bluering',
     it:[{k:'atk',v:10,t:'蓝环咬击'},{k:'psn',v:4,t:'河豚毒素'},{k:'atk',v:14,t:'剧毒连击'}]},
-
   bigfin:{n:'莱氏拟乌贼',s:'Sepioteuthis lessoniana',hp:54,act:2,img:'bigfin',
     it:[{k:'atk',v:11,t:'变色突袭'},{k:'blk',v:10,t:'伪装闪避'}]},
   longarm:{n:'长腕章鱼',s:'Octopus minor',hp:58,act:2,img:'longarm',
@@ -457,7 +518,6 @@ const FOES = {
     it:[{k:'atk',v:15,t:'赤魔狂暴'},{k:'atk',v:18,t:'锯齿吸盘'}]},
   gpo:{n:'北太平洋巨型章鱼',s:'Enteroctopus dofleini',hp:118,act:2,boss:true,img:'gpo',
     it:[{k:'atk',v:15,t:'巨腕横扫'},{k:'blk',v:14,t:'巨岩掩体'},{k:'atk',v:20,t:'深海绞杀'}]},
-
   glass:{n:'玻璃乌贼',s:'Cranchiidae',hp:74,act:3,img:'glass',
     it:[{k:'blk',v:14,t:'透明折射'},{k:'atk',v:15,t:'幽灵穿刺'}]},
   blind:{n:'盲眼深海蛸',s:'Cirrothauma murrayi',hp:78,act:3,img:'blind',
@@ -467,28 +527,29 @@ const FOES = {
   colossal:{n:'大王酸浆鱿',s:'Mesonychoteuthis hamiltoni',hp:165,act:3,boss:true,img:'colossal',
     it:[{k:'atk',v:18,t:'旋转钩爪'},{k:'blk',v:16,t:'极地寒流'},{k:'atk',v:25,t:'酸浆毁灭斩'},{k:'psn',v:6,t:'深渊剧毒'}]}
 };
+const ACT_NAME={1:'第 1 幕 · 浅海珊瑚礁',2:'第 2 幕 · 幽暗沉船区',3:'第 3 幕 · 无光海沟'};
 
-const ACT_NAME = {1:'第 1 幕 · 浅海珊瑚礁',2:'第 2 幕 · 幽暗沉船区',3:'第 3 幕 · 无光海沟'};
-
-/* ============ 游戏主逻辑 ============ */
-const Game = {
+/* ================= 游戏主逻辑 ================= */
+const Game={
   s:null,
-
-  newRun(){
+  newRun(charKey){
     Audio.card();
-    this.s = {
-      hp:65, maxHp:65, gold:50, act:1, idx:0, nodes:[],
-      deck:['krill','krill','sandworm','hermit','hermit','clownfish','clownfish','shark','kelp','eel'],
-      relics:['hook'],
+    const ch=CHARS[charKey]||CHARS.dumbo;
+    this.s={
+      ch, hp:ch.hp, maxHp:ch.hp, gold:50, act:1, idx:0, nodes:[],
+      deck:[...ch.deck], relics:ch.relic?[ch.relic]:[],
       energy:3, maxEnergy:3, nextEnergy:0,
-      drawPile:[], hand:[], discard:[], playedPredatorThisFight:false,
+      drawPile:[], hand:[], discard:[],
       p:{block:0,thorns:0,poison:0},
-      e:{def:null,hp:0,maxHp:0,block:0,shock:0,poison:0,i:0},
-      inBattle:false
+      e:{def:null,hp:0,maxHp:0,block:0,shock:0,poison:0,freeze:0,vuln:0,i:0},
+      buffs:{swarm:0,glow:0,growth:0},
+      ateCount:0, keepBlock:false, costDown:0, fog:0, skipEnemy:false,
+      tide:false, paralyze:0, voltPower:false, frozenHalf:false,
+      growthBlock:false, tideBonus:0, skillCd:0, playedPredator:false,
+      lastPlayed:[], turnNo:0, inBattle:false
     };
     this.buildMap(1);
-    UI.show('scr-map');
-    UI.top();
+    UI.show('scr-map'); UI.top();
   },
 
   buildMap(act){
@@ -508,15 +569,19 @@ const Game = {
     UI.map();
   },
 
-  /* ---- 战斗 ---- */
+  /* --- 战斗生命周期 --- */
   startFight(foeKey){
     const def=FOES[foeKey], s=this.s;
-    s.e={def,hp:def.hp,maxHp:def.hp,block:0,shock:0,poison:0,i:0};
+    s.e={def,hp:def.hp,maxHp:def.hp,block:0,shock:0,poison:0,freeze:0,vuln:0,i:0};
     s.p={block:this.hasRelic('vent')?8:0,thorns:0,poison:0};
-    s.playedPredatorThisFight=false;
-    s.nextEnergy=0;
-    s.drawPile=shuffle([...s.deck]);
-    s.hand=[]; s.discard=[];
+    s.buffs={swarm:0,glow:0,growth:0};
+    s.ateCount=0; s.keepBlock=false; s.costDown=0; s.fog=0; s.skipEnemy=false;
+    s.tide=false; s.paralyze=0; s.voltPower=false; s.frozenHalf=false;
+    s.growthBlock=false; s.tideBonus=0; s.playedPredator=false; s.lastPlayed=[];
+    s.turnNo=0;
+    s.skillCd=0;
+    if(this.hasRelic('ink')) s.e.shock+=3;
+    s.drawPile=shuffle([...s.deck]); s.hand=[]; s.discard=[];
     s.inBattle=true;
     UI.show('scr-battle');
     this.startTurn();
@@ -524,13 +589,17 @@ const Game = {
 
   startTurn(){
     const s=this.s;
-    s.maxEnergy=3+(this.hasRelic('rum')?1:0);
+    s.turnNo++;
+    s.maxEnergy=3+(this.hasRelic('rum')?1:0)+(s.ch.skill.type==='passive'?1:0);
     s.energy=s.maxEnergy+s.nextEnergy;
     s.nextEnergy=0;
-    s.p.block=0;
+    if(!s.keepBlock) s.p.block=0;
+    if(this.hasRelic('shell')) s.p.block+=3;
+    if(s.growthBlock && s.buffs.growth>0) s.p.block+=s.buffs.growth*2;
+    s.costDown=0;
     this.draw(5);
-    UI.log('你的回合 - 洋流 '+s.energy);
-    UI.battle();
+    UI.log('回合 '+s.turnNo+' · 洋流 '+s.energy);
+    UI.battle(); UI.top();
   },
 
   draw(n){
@@ -539,95 +608,179 @@ const Game = {
       if(!s.drawPile.length){
         if(!s.discard.length) break;
         s.drawPile=shuffle(s.discard); s.discard=[];
+        if(this.hasRelic('lens')) { if(s.hand.length<10) s.hand.push(s.drawPile.pop()); }
       }
       if(s.hand.length<10) s.hand.push(s.drawPile.pop());
     }
   },
 
-  toHand(id){ if(this.s.hand.length<10) this.s.hand.push(id); },
-
-  hasRelic(id){ return this.s.relics.includes(id); },
-  hitEnemy(n,pierce){
-    const e=this.s.e;
-    let d=n;
-    if(!pierce&&e.block>0){ const a=Math.min(e.block,d); e.block-=a; d-=a; }
-    if(d>0){ e.hp=Math.max(0,e.hp-d); Audio.hit(); UI.shake('e-art'); }
-  },
-  hurtPlayer(n){
-    const s=this.s,p=s.p;
-    let d=n;
-    if(s.e.shock>0) d=Math.floor(d*0.75);
-    if(p.block>0){ const a=Math.min(p.block,d); p.block-=a; d-=a; }
-    if(d>0){ s.hp=Math.max(0,s.hp-d); Audio.hit(); UI.shake('p-art'); }
-    if(p.thorns>0) this.hitEnemy(p.thorns);
+  /* --- 效果助手（供卡牌调用） --- */
+  hasBait(){ return this.s.hand.some(id=>id==='krill'||id==='sandworm'||id==='sardine'||id==='clownfish'); },
+  hit(n,pierce){
+    const s=this.s,e=s.e;
+    let d=Math.round(n*(1+e.vuln*0.25));
+    if(s.voltPower) d+=e.shock;
+    if(!pierce&&e.block>0){const a=Math.min(e.block,d);e.block-=a;d-=a;}
+    if(d>0){e.hp=Math.max(0,e.hp-d);Audio.hit();UI.shake('e-art');}
   },
   block(n){ this.s.p.block+=n; },
-  heal(n){ this.s.hp=Math.min(this.s.maxHp,this.s.hp+n); Audio.heal(); },
+  heal(n){ const s=this.s; s.hp=Math.min(s.maxHp,s.hp+n); if(n>0)Audio.heal(); },
+  gain(n){ this.s.energy+=n; },
+  psn(n){ this.s.e.poison+=n; },
+  shk(n){ this.s.e.shock+=n; },
+  frz(n){ this.s.e.freeze+=n; },
+  vln(n){ this.s.e.vuln+=n; },
+  thr(n){ this.s.p.thorns+=n; },
+  buff(k,n){ const b=this.s.buffs; b[k]=(b[k]||0)+n; return b[k]; },
+  log(t){ UI.log(t); },
 
+  addHand(id,n){ n=n||1; const s=this.s; for(let i=0;i<n;i++) if(s.hand.length<10) s.hand.push(id); },
+  mimicHand(free){
+    const s=this.s;
+    if(!s.hand.length) return;
+    const id=s.hand[(Math.random()*s.hand.length)|0];
+    if(s.hand.length<10){ s.hand.push(id); UI.log('复制了 '+CARDS[id].n); }
+  },
+  mimicZero(){
+    const s=this.s;
+    const zeros=[...new Set(s.hand.filter(id=>CARDS[id].c===0))];
+    zeros.forEach(id=>{ if(s.hand.length<10) s.hand.push(id); });
+    if(zeros.length) UI.log('拟态：复制了 '+zeros.length+' 张 0 费牌');
+  },
+  replayLast(n){
+    const s=this.s, cnt=n||1;
+    const last=s.lastPlayed.slice(-cnt);
+    last.forEach(id=>{ if(s.hand.length<10) s.hand.push(id); });
+    if(last.length) UI.log('回响：'+last.map(i=>CARDS[i].n).join('、'));
+  },
+  recall(){
+    const s=this.s;
+    if(!s.discard.length) return;
+    const i=(Math.random()*s.discard.length)|0;
+    const id=s.discard.splice(i,1)[0];
+    if(s.hand.length<10) s.hand.push(id);
+    UI.log('从弃牌堆取回 '+CARDS[id].n);
+  },
+
+  hasRelic(id){ return this.s.relics.includes(id); },
+
+  /* --- 出牌 --- */
   playCard(handIdx){
-    const s=this.s, id=s.hand[handIdx], card=CARDS[id];
-    let cost=card.c;
-    const baitIdx = card.eat ? s.hand.findIndex((x,i)=>i!==handIdx&&CARDS[x].t==='bait') : -1;
-    if(card.eat && baitIdx>=0 && id==='orca') cost=Math.max(0,cost-1);
+    const s=this.s, id=s.hand[handIdx];
+    if(!id) return;
+    const card=CARDS[id];
+    let cost=Math.max(0,card.c-(s.costDown>0?1:0));
+    const isBait=['krill','sandworm','sardine','clownfish'].includes(id);
+    const canDevour=card.a==='devour'&&card.c>=2&&this.hasBait()&&!isBait;
+    if(canDevour&&id==='orca') cost=Math.max(0,cost-1);
     if(s.energy<cost) return;
 
+    if(this.hasRelic('pearl2')&&s.turnNo>0&&!s._playedThisTurn){ s._playedThisTurn=true; s.energy+=1; }
     s.energy-=cost;
+    if(s.costDown>0) s.costDown--;
     s.hand.splice(handIdx,1);
     s.discard.push(id);
 
     let ate=false;
-    if(card.eat){
-      const bi=s.hand.findIndex(x=>CARDS[x].t==='bait');
+    if(canDevour){
+      const bi=s.hand.findIndex(x=>['krill','sandworm','sardine','clownfish'].includes(x));
       if(bi>=0){
         const eaten=s.hand.splice(bi,1)[0];
         s.discard.push(eaten);
-        ate=true;
+        ate=true; s.ateCount++;
         Audio.eat();
-        UI.log('🦈 吞噬 · '+CARDS[eaten].n+' → 威力爆发！');
+        UI.log('🦈 吞噬 '+CARDS[eaten].n+' → 爆发！');
         if(this.hasRelic('sonar')) this.draw(1);
+        if(this.hasRelic('fang')) this.hit(5,true);
       } else Audio.card();
     } else Audio.card();
 
-    if(card.t==='plant' && this.hasRelic('pearl')) this.heal(3);
+    if(card.a==='symbio'&&this.hasRelic('pearl')) this.heal(3);
 
-    card.f(this,ate);
+    card.f(this,{ate});
+    s.lastPlayed.push(id);
+    if(s.lastPlayed.length>6) s.lastPlayed.shift();
 
-    if(card.t==='pred'&&!s.playedPredatorThisFight&&this.hasRelic('hook')){
-      s.playedPredatorThisFight=true; this.hitEnemy(6);
+    if(card.a==='devour'&&!s.playedPredator&&this.hasRelic('hook')){
+      s.playedPredator=true; this.hit(6);
     }
-    if(card.c===0&&this.hasRelic('plastic')) this.hitEnemy(3);
-    if(ate) UI.log('吞噬爆发！');
+    if(card.c===0&&this.hasRelic('plastic')) this.hit(3);
 
-    UI.battle();
+    UI.battle(); UI.top();
     this.checkEnd();
   },
 
+  /* --- 技能 --- */
+  useSkill(){
+    const s=this.s, sk=s.ch.skill;
+    if(sk.type==='passive'){ UI.log('被动技能始终生效'); return; }
+    if(s.skillCd>0){ UI.log('技能冷却中（'+s.skillCd+'）'); return; }
+    Audio.skill();
+    if(s.ch.key==='mimic'){ this.mimicHandWithZero(); }
+    else if(s.ch.key==='bluering'){ this.psn(3); UI.log('剧毒腺：施加 3 层剧毒'); }
+    s.skillCd=sk.cd;
+    UI.battle();
+  },
+  mimicHandWithZero(){
+    const s=this.s;
+    if(!s.hand.length){ UI.log('手牌为空，技能无法发动'); return; }
+    const id=s.hand[(Math.random()*s.hand.length)|0];
+    if(s.hand.length<10) s.hand.push(id);
+    UI.log('拟态复制：'+CARDS[id].n);
+  },
+
+  /* --- 回合结束 --- */
   endTurn(){
     const s=this.s;
     while(s.hand.length) s.discard.push(s.hand.pop());
+    s._playedThisTurn=false;
 
-    // 敌方中毒
-    if(s.e.poison>0){ s.e.hp=Math.max(0,s.e.hp-s.e.poison); s.e.poison--; if(this.checkEnd()) return; }
+    if(s.e.poison>0){
+      s.e.hp=Math.max(0,s.e.hp-s.e.poison);
+      UI.log('剧毒侵蚀 '+s.e.poison);
+      s.e.poison--;
+      if(this.checkEnd()) return;
+    }
 
-    // 敌人行动
     s.e.block=0;
-    const it=s.e.def.it[s.e.i%s.e.def.it.length];
-    let msg='';
-    if(it.k==='atk'){ this.hurtPlayer(it.v); msg=it.t+' '+it.v; }
-    else if(it.k==='blk'){ s.e.block+=it.v; msg=it.t+' +'+it.v+' 护甲'; }
-    else if(it.k==='mix'){ this.hurtPlayer(it.a); s.e.block+=it.b; msg=it.t+' '+it.a+'/+'+it.b; }
-    else if(it.k==='psn'){ s.p.poison+=it.v; msg=it.t+' +'+it.v; }
-    else if(it.k==='heal'){ s.e.hp=Math.min(s.e.maxHp,s.e.hp+it.v); msg=it.t+' +'+it.v; }
-    UI.log('对手：'+msg);
-
+    if(s.skipEnemy){
+      UI.log('对手被冻结，无法行动');
+    } else {
+      const it=s.e.def.it[s.e.i%s.e.def.it.length];
+      let msg='';
+      if(it.k==='atk'){ this.hurtPlayer(it.v); msg=it.t+' '+it.v; }
+      else if(it.k==='blk'){ s.e.block+=it.v; msg=it.t+' +'+it.v+' 护甲'; }
+      else if(it.k==='mix'){ this.hurtPlayer(it.a); s.e.block+=it.b; msg=it.t+' '+it.a+'/+'+it.b; }
+      else if(it.k==='psn'){ s.p.poison+=it.v; msg=it.t+' +'+it.v; }
+      else if(it.k==='heal'){ s.e.hp=Math.min(s.e.maxHp,s.e.hp+it.v); msg=it.t+' +'+it.v; }
+      UI.log('对手：'+msg);
+      s.e.i++;
+    }
+    s.skipEnemy=false;
     if(s.e.shock>0) s.e.shock--;
-    s.e.i++;
+    if(s.e.vuln>0) s.e.vuln--;
+    if(s.e.freeze>0) s.e.freeze--;
 
-    // 玩家中毒
     if(s.p.poison>0){ s.hp=Math.max(0,s.hp-s.p.poison); s.p.poison--; }
+    if(s.skillCd>0) s.skillCd--;
 
     if(this.checkEnd()) return;
     this.startTurn();
+  },
+
+  hurtPlayer(base){
+    const s=this.s;
+    let mult=1;
+    if(s.e.shock>0) mult-=0.25;
+    if(s.fog) mult-=s.fog/100;
+    if(s.paralyze) mult-=s.paralyze/100;
+    if(s.frozenHalf) mult*=0.5;
+    let d=Math.round(base*Math.max(0.15,mult));
+    if(s.e.freeze>0) d=Math.max(0,d-2*s.e.freeze);
+    let dd=d;
+    if(s.p.block>0){ const a=Math.min(s.p.block,dd); s.p.block-=a; dd-=a; }
+    if(dd>0){ s.hp=Math.max(0,s.hp-dd); Audio.hit(); UI.shake('p-art'); }
+    if(s.p.thorns>0) this.hit(s.p.thorns);
   },
 
   checkEnd(){
@@ -638,17 +791,25 @@ const Game = {
       if(this.hasRelic('tooth')){ s.maxHp+=4; s.hp+=4; }
       s.inBattle=false;
       const boss=!!s.e.def.boss;
-      if(boss && s.act===3){ this.gameOver(true); return true; }
+      if(boss&&s.act===3){ this.gameOver(true); return true; }
       this.reward(boss);
       return true;
     }
     return false;
   },
 
-  /* ---- 奖励 / 节点 ---- */
+  /* --- 奖励 --- */
+  pickByRarity(){
+    const pool=Object.keys(CARDS);
+    const roll=Math.random()*100;
+    let want = roll<60?'c': roll<86?'u': roll<97?'r':'l';
+    let cand=pool.filter(id=>CARDS[id].r===want);
+    if(!cand.length) cand=pool;
+    return cand[(Math.random()*cand.length)|0];
+  },
+
   reward(isBoss){
-    const s=this.s;
-    const gold=isBoss?45:22;
+    const s=this.s, gold=isBoss?45:22;
     s.gold+=gold;
     let relicMsg='';
     if(isBoss){
@@ -659,8 +820,8 @@ const Game = {
         relicMsg='<div class="notice">🎁 获得 Boss 遗物：'+RELICS[r].i+' '+RELICS[r].n+'</div>';
       }
     }
-    const pool=Object.keys(CARDS);
-    const picks=[0,1,2].map(()=>pool[(Math.random()*pool.length)|0]);
+    const picks=[]; let guard=0;
+    while(picks.length<3&&guard++<40){ const id=this.pickByRarity(); if(!picks.includes(id)) picks.push(id); }
     UI.sheet(`
       <h2>🎉 击败了 ${s.e.def.n}</h2>
       <p class="lead">获得 <b style="color:#fef08a">${gold}</b> 金币 · 选 1 张卡牌加入牌库</p>
@@ -679,8 +840,7 @@ const Game = {
   advance(wasBoss){
     UI.closeSheet();
     const s=this.s;
-    if(wasBoss) this.buildMap(s.act+1);
-    else { s.idx++; UI.map(); }
+    if(wasBoss) this.buildMap(s.act+1); else { s.idx++; UI.map(); }
     UI.show('scr-map'); UI.top();
   },
 
@@ -703,8 +863,9 @@ const Game = {
   },
 
   shop(){
-    const s=this.s, pool=Object.keys(CARDS);
-    const items=[0,1,2].map(()=>pool[(Math.random()*pool.length)|0]);
+    const s=this.s;
+    const items=[]; let guard=0;
+    while(items.length<3&&guard++<40){ const id=this.pickByRarity(); if(!items.includes(id)) items.push(id); }
     UI.sheet(`
       <h2>🐚 沉船商店</h2>
       <p class="lead">当前金币：<b style="color:#fef08a">${s.gold}</b></p>
@@ -713,10 +874,10 @@ const Game = {
     `);
     const box=document.getElementById('picks');
     items.forEach(id=>{
-      const price=25+CARDS[id].c*10;
+      const price=24+CARDS[id].c*9;
       const el=UI.cardEl(id);
       const tag=document.createElement('div');
-      tag.style.cssText='background:#fef08a;color:#3a2f00;font-weight:900;font-size:12px;text-align:center;padding:3px';
+      tag.style.cssText='background:#fef08a;color:#3a2f00;font-weight:900;font-size:12px;text-align:center;padding:3px;border-radius:0 0 12px 12px';
       tag.textContent='🪙 '+price;
       el.appendChild(tag);
       el.onclick=()=>{
@@ -729,45 +890,57 @@ const Game = {
   gameOver(win){
     UI.sheet(win?`
       <h2 style="color:#fef08a">🏆 通关！深海霸主</h2>
-      <p class="lead">拟态小章鱼墨仔击败了大王酸浆鱿，成为新的深海传奇。</p>
-      <button class="btn" onclick="UI.closeSheet();Game.newRun()">再来一局</button>
+      <p class="lead">${this.s.ch.n} 击败了大王酸浆鱿，成为新的深海传奇。</p>
+      <button class="btn" onclick="UI.closeSheet();UI.title()">换个角色再来</button>
     `:`
       <h2 style="color:#ff8b7b">💀 墨水耗尽</h2>
-      <p class="lead">你在第 ${this.s.act} 幕倒下了。深海依然充满挑战。</p>
-      <button class="btn" onclick="UI.closeSheet();Game.newRun()">重新挑战</button>
+      <p class="lead">在第 ${this.s.act} 幕倒下了 · 打出了 ${this.s.turnNo} 个回合</p>
+      <button class="btn" onclick="UI.closeSheet();UI.title()">重新挑战</button>
     `);
   }
 };
 
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
-/* ============ UI 渲染 ============ */
-const UI = {
-  show(id){
-    ['scr-title','scr-map','scr-battle'].forEach(x=>{
-      document.getElementById(x).classList.toggle('hide', x!==id);
-    });
-  },
+/* ================= UI ================= */
+const UI={
+  show(id){ ['scr-title','scr-map','scr-battle'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id)); },
   log(t){ document.getElementById('log').textContent=t; },
-  shake(id){
-    const el=document.getElementById(id);
-    el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
+  shake(id){ const el=document.getElementById(id); el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); },
+
+  title(){
+    const box=document.getElementById('char-list');
+    box.innerHTML='';
+    Object.values(CHARS).forEach(ch=>{
+      const el=document.createElement('div');
+      el.className='charpick';
+      el.innerHTML=`
+        <div class="face"><img src="img/${ch.img}.jpg" alt="" onerror="this.src='img/player.jpg'"></div>
+        <h3>${ch.n}</h3>
+        <div class="sp">${ch.sp}</div>
+        <div class="sk">✨ ${ch.skill.n} · ${ch.skill.d}</div>
+        <div class="hp">❤️ ${ch.hp} 生命 · ${ch.desc}</div>`;
+      el.onclick=()=>Game.newRun(ch.key);
+      box.appendChild(el);
+    });
+    this.show('scr-title');
   },
+
   top(){
     const s=Game.s; if(!s) return;
+    document.getElementById('ui-char').innerHTML='🐙 <b>'+s.ch.n+'</b>';
     document.getElementById('ui-hp').innerHTML='❤️ <b>'+s.hp+'/'+s.maxHp+'</b>';
     document.getElementById('ui-gold').innerHTML='🪙 <b>'+s.gold+'</b>';
     document.getElementById('ui-act').innerHTML='🌊 <b>'+ACT_NAME[s.act]+'</b>';
     document.getElementById('ui-deckn').textContent=s.deck.length;
     document.getElementById('ui-relics').innerHTML=s.relics.map(id=>{
-      const r=RELICS[id];
-      return '<div class="relic" data-tip="'+r.n+'：'+r.d+'">'+r.i+'</div>';
+      const r=RELICS[id]; return '<div class="relic" data-tip="'+r.n+'：'+r.d+'">'+r.i+'</div>';
     }).join('');
   },
+
   map(){
     const s=Game.s;
     document.getElementById('map-title').textContent=ACT_NAME[s.act];
-    document.getElementById('map-hint').textContent='点击高亮的站点继续前进 →';
     const track=document.getElementById('map-track');
     track.innerHTML='';
     s.nodes.forEach((n,i)=>{
@@ -778,44 +951,70 @@ const UI = {
       track.appendChild(d);
     });
   },
+
   cardEl(id){
     const c=CARDS[id];
     const el=document.createElement('div');
-    el.className='card';
+    const rc={c:'r-common',u:'r-uncommon',r:'r-rare',l:'r-legend'}[c.r];
+    el.className='card '+rc;
     el.innerHTML=`
-      <div class="img"><img src="img/${c.img}.jpg" alt="${c.n}"><div class="cost">${c.c}</div></div>
+      <div class="img">
+        <img src="img/${c.img}.jpg" alt="" onerror="this.style.display='none';this.parentNode.querySelector('.fb').style.display='grid'">
+        <div class="fb" style="display:none">🐟</div>
+        <div class="cost">${c.c}</div><div class="rar"></div>
+      </div>
       <div class="body">
         <div class="nm">${c.n}</div>
-        <div class="tp ${c.t}">${TTYPE[c.t]}</div>
+        <div class="tags">
+          <span class="ac" style="background:${ARCH[c.a].c}">${ARCH[c.a].n}</span>
+          <span class="rr">${RAR[c.r].n}</span>
+        </div>
         <div class="ds">${c.d}</div>
       </div>`;
     return el;
   },
+
   battle(){
-    const s=Game.s, e=s.e;
-    document.getElementById('p-hpbar').style.width=(s.hp/s.maxHp*100)+'%';
+    const s=Game.s,e=s.e;
+    document.getElementById('p-hpbar').style.width=Math.max(0,s.hp/s.maxHp*100)+'%';
     document.getElementById('p-hptext').textContent=s.hp+' / '+s.maxHp;
-    document.getElementById('e-hpbar').style.width=(e.hp/e.maxHp*100)+'%';
+    document.getElementById('e-hpbar').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
     document.getElementById('e-hptext').textContent=e.hp+' / '+e.maxHp;
     document.getElementById('e-name').textContent=e.def.n;
     document.getElementById('e-species').textContent=e.def.s;
-    document.getElementById('e-art').innerHTML='<img src="img/'+e.def.img+'.jpg" alt="">';
-    document.getElementById('p-art').innerHTML='<img src="img/player.jpg" alt="">';
+    document.getElementById('e-art').innerHTML='<img src="img/'+e.def.img+'.jpg" alt="" onerror="this.src=\'img/sepiella.jpg\'">';
+    document.getElementById('p-art').innerHTML='<img src="img/'+s.ch.img+'.jpg" alt="" onerror="this.src=\'img/player.jpg\'">';
+    document.getElementById('p-name').textContent=s.ch.n;
+    document.getElementById('p-species').textContent=s.ch.sp;
 
     const ps=[];
     if(s.p.block>0) ps.push('<span class="st blk">🛡 '+s.p.block+'</span>');
     if(s.p.thorns>0) ps.push('<span class="st thr">🌵 '+s.p.thorns+'</span>');
     if(s.p.poison>0) ps.push('<span class="st psn">☠ '+s.p.poison+'</span>');
+    if(s.buffs.swarm>0) ps.push('<span class="st buff">🐛 虫群 '+s.buffs.swarm+'</span>');
+    if(s.buffs.glow>0) ps.push('<span class="st buff">✨ 发光 '+s.buffs.glow+'</span>');
+    if(s.buffs.growth>0) ps.push('<span class="st buff">🌱 成长 '+s.buffs.growth+'</span>');
+    if(s.tide) ps.push('<span class="st shk">🌊 涨潮</span>');
     document.getElementById('p-status').innerHTML=ps.join('');
 
     const es=[];
     if(e.block>0) es.push('<span class="st blk">🛡 '+e.block+'</span>');
     if(e.shock>0) es.push('<span class="st shk">⚡ '+e.shock+'</span>');
     if(e.poison>0) es.push('<span class="st psn">☠ '+e.poison+'</span>');
+    if(e.vuln>0) es.push('<span class="st vln">💢 '+e.vuln+'</span>');
+    if(e.freeze>0) es.push('<span class="st frz">❄ '+e.freeze+'</span>');
     document.getElementById('e-status').innerHTML=es.join('');
 
     const it=e.def.it[e.i%e.def.it.length];
     document.getElementById('e-intent').textContent='意图：'+it.t;
+
+    const sk=s.ch.skill;
+    document.getElementById('skill-name').textContent=sk.n;
+    document.getElementById('skill-desc').textContent=sk.d;
+    const btn=document.getElementById('skill-btn'), cd=document.getElementById('skill-cd');
+    if(sk.type==='passive'){ cd.textContent='被动'; btn.classList.add('off'); btn.style.cursor='default'; }
+    else if(s.skillCd>0){ cd.textContent='CD '+s.skillCd; btn.classList.add('off'); btn.style.cursor='not-allowed'; }
+    else { cd.textContent='就绪'; btn.classList.remove('off'); btn.style.cursor='pointer'; }
 
     document.getElementById('ui-energy').textContent='⚡ 洋流 '+s.energy+' / '+s.maxEnergy;
     document.getElementById('ui-draw').textContent=s.drawPile.length;
@@ -823,34 +1022,34 @@ const UI = {
 
     const hand=document.getElementById('hand');
     hand.innerHTML='';
-    const hasBait=s.hand.some(x=>CARDS[x].t==='bait');
+    const bait=Game.hasBait();
     s.hand.forEach((id,i)=>{
       const c=CARDS[id];
-      let cost=c.c;
-      const hot=c.eat&&hasBait;
-      if(id==='orca'&&hot) cost=Math.max(0,cost-1);
+      let cost=Math.max(0,c.c-(s.costDown>0?1:0));
+      const isBait=['krill','sandworm','sardine','clownfish'].includes(id);
+      const canDev=c.a==='devour'&&c.c>=2&&bait&&!isBait;
+      if(canDev&&id==='orca') cost=Math.max(0,cost-1);
       const el=this.cardEl(id);
       el.querySelector('.cost').textContent=cost;
-      if(hot) el.classList.add('hot');
+      if(canDev) el.classList.add('hot');
       if(s.energy<cost) el.classList.add('dead');
       else el.onclick=()=>Game.playCard(i);
       hand.appendChild(el);
     });
-    this.top();
   },
-  sheet(html){
-    document.getElementById('sheet').innerHTML=html;
-    document.getElementById('mask').classList.add('on');
-  },
+
+  sheet(html){ document.getElementById('sheet').innerHTML=html; document.getElementById('mask').classList.add('on'); },
   closeSheet(){ document.getElementById('mask').classList.remove('on'); },
+
   openDeck(){
-    const s=Game.s;
-    if(!s){ return; }
+    const s=Game.s; if(!s) return;
     this.sheet('<h2>🃏 当前牌库（'+s.deck.length+' 张）</h2><div class="picks" id="picks"></div><button class="btn ghost" onclick="UI.closeSheet()">关闭</button>');
     const box=document.getElementById('picks');
     s.deck.forEach(id=>box.appendChild(this.cardEl(id)));
   }
 };
+
+UI.title();
 </script>
 </body>
 </html>
