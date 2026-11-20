@@ -150,37 +150,72 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .log{text-align:center;font-size:12.5px;color:#9dc9bb;min-height:18px;margin:2px 0 8px;font-weight:600}
 .hand{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;min-height:228px;padding:4px}
 
-/* 卡牌 */
-.card{width:146px;border-radius:15px;overflow:hidden;cursor:pointer;position:relative;background:var(--cream);
-  border:2px solid #d8d2c2;box-shadow:0 6px 18px rgba(0,0,0,.32);transition:transform .14s,box-shadow .14s;
-  display:flex;flex-direction:column}
-.card:hover{transform:translateY(-11px);box-shadow:0 18px 34px rgba(0,0,0,.42)}
-.card.dead{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
-.card.dead:hover{transform:none;box-shadow:0 6px 18px rgba(0,0,0,.32)}
-.card.hot{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,139,123,.4),0 8px 20px rgba(0,0,0,.35)}
-.card .img{height:84px;background:#0b1d19;overflow:hidden;position:relative}
-.card .img img{width:100%;height:100%;object-fit:cover;display:block}
-.card .img .fb{position:absolute;inset:0;display:grid;place-items:center;font-size:30px;
+/* 卡牌（图片铺满 + 底部渐变文字区） */
+.card{
+  width:150px;height:214px;border-radius:15px;overflow:hidden;position:relative;cursor:pointer;
+  background:#0a1a16;border:2px solid #2c4a42;
+  box-shadow:0 8px 20px rgba(0,0,0,.45);
+  transition:transform .16s cubic-bezier(.2,.9,.3,1.25),box-shadow .16s,border-color .16s;
+  transform-origin:50% 100%;
+  display:flex;flex-direction:column;
+}
+.card .art{position:absolute;inset:0;overflow:hidden;background:#08110f}
+.card .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.card:hover .art img{transform:scale(1.07)}
+.card .fb{position:absolute;inset:0;display:grid;place-items:center;font-size:34px;
   background:linear-gradient(135deg,#1d4238,#0b1d19)}
-.card .cost{position:absolute;top:5px;left:5px;width:24px;height:24px;border-radius:50%;
-  background:linear-gradient(180deg,#b9f8dd,#5eead4);color:#0b1d19;display:grid;place-items:center;
-  font-weight:900;font-size:12.5px;box-shadow:0 2px 8px rgba(0,0,0,.5);border:1.5px solid #0b1d19}
-.card .rar{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
-  border:1.5px solid rgba(0,0,0,.5)}
-.r-common .rar{background:#cfcabb}
-.r-uncommon .rar{background:#78dcff}
-.r-rare .rar{background:#dcb4ff}
-.r-legend .rar{background:#fef08a;box-shadow:0 0 8px #fef08a}
-.r-common{border-color:#d8d2c2}
-.r-uncommon{border-color:#78dcff}
-.r-rare{border-color:#dcb4ff}
-.r-legend{border-color:#fef08a;box-shadow:0 0 0 2px rgba(254,240,138,.28),0 6px 18px rgba(0,0,0,.32)}
-.card .body{padding:6px 7px 8px;display:flex;flex-direction:column;gap:3px;flex:1}
-.card .nm{font-weight:900;font-size:12px;color:#182b26;line-height:1.18}
-.card .tags{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
-.card .ac{font-size:9px;font-weight:900;border-radius:4px;padding:1px 5px;color:#fff}
-.card .rr{font-size:8.5px;font-weight:900;border-radius:4px;padding:1px 4px;background:#eee8d8;color:#6b6455}
-.card .ds{font-size:10px;line-height:1.34;color:#41524c;font-weight:600;flex:1}
+.card .grad{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,14,12,.6) 0%,rgba(5,14,12,0) 22%),
+             linear-gradient(0deg,rgba(5,14,12,.97) 30%,rgba(5,14,12,.82) 46%,rgba(5,14,12,0) 68%)}
+.card .cost{position:absolute;top:6px;left:6px;width:25px;height:25px;border-radius:50%;
+  background:linear-gradient(180deg,#d4fff0,#5eead4);color:#06231d;display:grid;place-items:center;
+  font-weight:900;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.6),inset 0 -1px 0 rgba(0,0,0,.2);
+  border:1.5px solid rgba(6,35,29,.85);z-index:3}
+.card .gem{position:absolute;top:9px;right:9px;width:8px;height:8px;transform:rotate(45deg);z-index:3;
+  border:1px solid rgba(0,0,0,.55);box-shadow:0 0 6px rgba(0,0,0,.5)}
+.card::after{content:"";position:absolute;inset:5px;border-radius:10px;pointer-events:none;z-index:4;
+  border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.card .panel{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:20px 9px 9px;
+  background:linear-gradient(0deg,rgba(5,14,12,.985) 0%,rgba(5,14,12,.95) 52%,rgba(5,14,12,.72) 78%,rgba(5,14,12,0) 100%)}
+.card .nm{font-size:12.5px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:5px;
+  text-shadow:0 1px 5px rgba(0,0,0,.95);letter-spacing:.2px;padding-bottom:4px;
+  border-bottom:1px solid rgba(255,255,255,.13)}
+.card .txt{font-size:10.3px;line-height:1.45;color:#cfe8df;font-weight:600;display:block}
+.card .txt .k{color:#8ef0d0;font-weight:900}
+.card.dead{filter:grayscale(.75) brightness(.62)}
+.card.dead:hover{transform:none;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.card.hot{border-color:#ff8b7b;box-shadow:0 0 0 2px rgba(255,139,123,.45),0 8px 22px rgba(0,0,0,.5)}
+.card:hover{transform:translateY(-22px) scale(1.26);z-index:70;border-color:#7ef0c9;
+  box-shadow:0 26px 50px rgba(0,0,0,.62),0 0 0 2px rgba(126,240,201,.35)}
+.hand .card:hover{transform:translateY(-30px) scale(1.3)}
+.r-common{border-color:#3a5e55}
+.r-uncommon{border-color:#4aa7c9;box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 14px rgba(120,220,255,.14)}
+.r-rare{border-color:#9b6fe0;box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 16px rgba(220,180,255,.22)}
+.r-legend{border-color:#e8c94a;box-shadow:0 8px 22px rgba(0,0,0,.5),0 0 20px rgba(254,240,138,.3)}
+.r-common .gem{background:#7f9c92}
+.r-uncommon .gem{background:#78dcff}
+.r-rare .gem{background:#dcb4ff}
+.r-legend .gem{background:#fef08a;box-shadow:0 0 10px #fef08a}
+
+/* 关键词浮窗 */
+.kwpanel{position:fixed;z-index:200;max-width:262px;background:rgba(8,22,19,.97);
+  border:1.5px solid #3f7a68;border-radius:14px;padding:11px 13px;display:none;
+  box-shadow:0 18px 44px rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+.kwpanel.on{display:block}
+.kwpanel .kwh{font-size:11px;color:#6f9c8c;letter-spacing:2px;margin-bottom:7px;font-weight:800}
+.kwpanel .kwi{margin-bottom:7px}
+.kwpanel .kwi:last-child{margin-bottom:0}
+.kwpanel .kwn{font-size:12.5px;font-weight:900;color:#8ef0d0;margin-bottom:1px}
+.kwpanel .kwd{font-size:11.5px;line-height:1.5;color:#b9d9cf;font-weight:600}
+
+/* 图鉴筛选 */
+.filters{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0 14px}
+.chip{font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:999px;cursor:pointer;
+  background:rgba(11,29,25,.8);border:1.5px solid #2f5a4e;color:#9dc9bb;transition:.14s}
+.chip:hover{border-color:#5eead4;color:#ccfbf1}
+.chip.on{background:rgba(94,234,212,.18);border-color:#5eead4;color:#a7f3d0}
+.distbar{display:flex;height:8px;border-radius:999px;overflow:hidden;margin:10px 0 4px}
+.distbar div{height:100%}
 
 /* 弹窗 */
 .mask{position:fixed;inset:0;background:rgba(4,12,10,.86);backdrop-filter:blur(6px);display:none;
@@ -216,6 +251,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     <span class="pill" id="ui-act">🌊 <b>第1幕</b></span>
     <div class="relics" id="ui-relics"></div>
     <button class="btn ghost sm" onclick="UI.openDeck()">🃏 牌库 <span id="ui-deckn">10</span></button>
+    <button class="btn ghost sm" onclick="UI.openCodex()">📖 图鉴</button>
     <button class="btn ghost sm" id="btn-mute" onclick="Audio.toggle()">🔊</button>
   </div>
 
@@ -227,6 +263,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="tagrow">
       <span>12 大流派</span><span>120+ 张卡牌</span><span>4 级稀有度</span><span>14 种头足类对手</span><span>角色专属技能</span>
     </div>
+    <div class="cta" style="margin-top:16px"><button class="btn ghost" onclick="UI.openCodex()">📖 卡牌图鉴（120 张）</button></div>
     <div class="chars" id="char-list"></div>
   </div>
 
@@ -273,6 +310,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 </div>
 
+<div class="kwpanel" id="kwpanel"></div>
 <div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
 <script>
 /* ================= 音效 ================= */
@@ -312,6 +350,38 @@ const ARCH={
   volt  :{n:'电击',c:'#ffe066',d:'麻痹连锁，敌人伤害大打折'}
 };
 const RAR={c:{n:'普通',w:60},u:{n:'精良',w:26},r:{n:'稀有',w:11},l:{n:'传说',w:3}};
+
+
+/* ================= 关键词系统（统一说明） ================= */
+const KW={
+ '护甲':'护甲：抵挡伤害。回合开始时通常清零（少数卡牌/遗物可保留）。',
+ '荆棘':'荆棘：每当被攻击，对攻击者造成等同层数的伤害。',
+ '麻痹':'麻痹：敌人攻击伤害 -25%（有层数即生效），回合结束减 1 层。',
+ '剧毒':'剧毒：敌人回合结束时受到等同层数的伤害，然后减 1 层。',
+ '易伤':'易伤：受到的伤害 +25%/层，回合结束减 1 层。',
+ '冻结':'冻结：敌人每次攻击额外 -2 伤害/层，回合结束减 1 层。',
+ '洋流':'洋流：打出卡牌所需能量，每回合恢复到上限。',
+ '吞噬':'吞噬：打出该牌时自动吃掉手牌中 1 张【饵料】以触发强化。',
+ '饵料':'饵料：磷虾、沙蚕、沙丁鱼、小丑鱼这类小鱼小虾，可被【吞噬】。',
+ '抽牌':'抽牌：从抽牌堆取牌加入手牌，手牌上限 10 张。',
+ '发光':'发光：本场累积层数，供发光流派卡牌换算伤害。',
+ '虫群':'虫群：本场累积层数，供虫群流派卡牌换算伤害。',
+ '成长':'成长：本场累积层数，供共生流派换算回血与护甲。',
+ '涨潮':'涨潮/退潮：潮汐流派状态，部分卡牌在涨潮时强化。',
+ '弃牌堆':'弃牌堆：打出的牌与弃掉的手牌，抽牌堆空时重新洗入。',
+ '手牌':'手牌：当前可打出的牌，上限 10 张。',
+ '生命':'生命：降到 0 则本局失败。'
+};
+function kwMark(text){
+  let out=text;
+  Object.keys(KW).forEach(k=>{
+    out=out.split(k).join('<span class="k">'+k+'</span>');
+  });
+  return out;
+}
+function kwIn(text){
+  return Object.keys(KW).filter(k=>text.indexOf(k)>=0);
+}
 
 /* ================= 卡牌库 ================= */
 const CARDS={};
@@ -799,13 +869,45 @@ const Game={
   },
 
   /* --- 奖励 --- */
-  pickByRarity(){
-    const pool=Object.keys(CARDS);
-    const roll=Math.random()*100;
-    let want = roll<60?'c': roll<86?'u': roll<97?'r':'l';
-    let cand=pool.filter(id=>CARDS[id].r===want);
+  /* --- 智能发牌：随牌库偏向同流派 --- */
+  affinity(){
+    const m={};
+    (this.s?this.s.deck:[]).forEach(id=>{ const a=CARDS[id].a; m[a]=(m[a]||0)+1; });
+    return m;
+  },
+  archMul(a){
+    const n=this.affinity()[a]||0;
+    return 1+Math.min(7,n*0.55);
+  },
+  cardWeight(id){
+    const c=CARDS[id];
+    let w=RAR[c.r].w*this.archMul(c.a);
+    const dup=this.s?this.s.deck.filter(x=>x===id).length:0;
+    if(dup>0) w*=1+Math.min(2.2,dup*0.28);
+    return w;
+  },
+  pickWeighted(exclude,forceArch){
+    const pool=Object.keys(CARDS).filter(id=>!exclude||!exclude.includes(id));
+    let cand=forceArch?pool.filter(id=>CARDS[id].a===forceArch):pool;
     if(!cand.length) cand=pool;
-    return cand[(Math.random()*cand.length)|0];
+    let total=0; const ws=cand.map(id=>{const w=this.cardWeight(id);total+=w;return w;});
+    let r=Math.random()*total;
+    for(let i=0;i<cand.length;i++){ r-=ws[i]; if(r<=0) return cand[i]; }
+    return cand[cand.length-1];
+  },
+  topArch(){
+    const m=this.affinity();
+    let best=null,bv=0;
+    Object.keys(m).forEach(k=>{ if(m[k]>bv){ bv=m[k]; best=k; } });
+    return bv>=2?best:null;
+  },
+  draftPicks(n,force){
+    const picks=[];
+    const top=force?force:this.topArch();
+    if(top && Math.random()<0.82) picks.push(this.pickWeighted(picks,top));
+    let guard=0;
+    while(picks.length<n&&guard++<80){ const id=this.pickWeighted(picks); if(id) picks.push(id); }
+    return picks;
   },
 
   reward(isBoss){
@@ -820,8 +922,7 @@ const Game={
         relicMsg='<div class="notice">🎁 获得 Boss 遗物：'+RELICS[r].i+' '+RELICS[r].n+'</div>';
       }
     }
-    const picks=[]; let guard=0;
-    while(picks.length<3&&guard++<40){ const id=this.pickByRarity(); if(!picks.includes(id)) picks.push(id); }
+    const picks=this.draftPicks(3);
     UI.sheet(`
       <h2>🎉 击败了 ${s.e.def.n}</h2>
       <p class="lead">获得 <b style="color:#fef08a">${gold}</b> 金币 · 选 1 张卡牌加入牌库</p>
@@ -864,8 +965,7 @@ const Game={
 
   shop(){
     const s=this.s;
-    const items=[]; let guard=0;
-    while(items.length<3&&guard++<40){ const id=this.pickByRarity(); if(!items.includes(id)) items.push(id); }
+    const items=this.draftPicks(3);
     UI.sheet(`
       <h2>🐚 沉船商店</h2>
       <p class="lead">当前金币：<b style="color:#fef08a">${s.gold}</b></p>
@@ -952,25 +1052,27 @@ const UI={
     });
   },
 
-  cardEl(id){
+  cardEl(id,opts){
+    opts=opts||{};
     const c=CARDS[id];
     const el=document.createElement('div');
     const rc={c:'r-common',u:'r-uncommon',r:'r-rare',l:'r-legend'}[c.r];
-    el.className='card '+rc;
+    el.className='card '+rc+(opts.fixed?' fixed':'');
+    el.dataset.card=id;
     el.innerHTML=`
-      <div class="img">
+      <div class="art">
         <img src="img/${c.img}.jpg" alt="" onerror="this.style.display='none';this.parentNode.querySelector('.fb').style.display='grid'">
         <div class="fb" style="display:none">🐟</div>
-        <div class="cost">${c.c}</div><div class="rar"></div>
       </div>
-      <div class="body">
+      <div class="grad"></div>
+      <div class="cost">${c.c}</div>
+      <div class="gem"></div>
+      <div class="panel">
         <div class="nm">${c.n}</div>
-        <div class="tags">
-          <span class="ac" style="background:${ARCH[c.a].c}">${ARCH[c.a].n}</span>
-          <span class="rr">${RAR[c.r].n}</span>
-        </div>
-        <div class="ds">${c.d}</div>
+        <div class="txt">${kwMark(c.d)}</div>
       </div>`;
+    el.addEventListener('mouseenter',()=>UI.showKW(el,c));
+    el.addEventListener('mouseleave',()=>UI.hideKW());
     return el;
   },
 
@@ -1039,13 +1141,74 @@ const UI={
   },
 
   sheet(html){ document.getElementById('sheet').innerHTML=html; document.getElementById('mask').classList.add('on'); },
-  closeSheet(){ document.getElementById('mask').classList.remove('on'); },
+  closeSheet(){ document.getElementById('mask').classList.remove('on'); document.getElementById('sheet').innerHTML=''; },
 
+  showKW(el,card){
+    const keys=kwIn(card.d);
+    const p=document.getElementById('kwpanel');
+    if(!keys.length){ p.classList.remove('on'); return; }
+    p.innerHTML='<div class="kwh">关键词</div>'+keys.map(k=>
+      '<div class="kwi"><div class="kwn">'+k+'</div><div class="kwd">'+KW[k].replace(k,'').replace(/^：/,'')+'</div></div>'
+    ).join('');
+    p.classList.add('on');
+    const r=el.getBoundingClientRect();
+    const pw=262, ph=p.offsetHeight||160;
+    let left, top;
+    if(r.right + 14 + pw < window.innerWidth){
+      left = r.right + 14; top = r.top + r.height/2 - ph/2;
+    } else {
+      left = r.left - 14 - pw; top = r.top + r.height/2 - ph/2;
+    }
+    top = Math.max(10, Math.min(top, window.innerHeight - ph - 10));
+    left = Math.max(10, left);
+    p.style.left=left+'px'; p.style.top=top+'px';
+  },
+  hideKW(){ document.getElementById('kwpanel').classList.remove('on'); },
+
+  openCodex(){
+    this._cxArch='all'; this._cxRar='all';
+    const n=Object.keys(CARDS).length;
+    this.sheet(`
+      <h2>📖 卡牌图鉴 <span style="font-size:12.5px;color:#8fbfae;font-weight:600">共 ${n} 张</span></h2>
+      <p class="lead">鼠标移到卡牌上可查看关键词说明</p>
+      <div class="filters" id="cx-arch"></div>
+      <div class="filters" id="cx-rar"></div>
+      <div class="picks" id="cx-list"></div>
+      <button class="btn ghost" onclick="UI.closeSheet()">关闭</button>`);
+    this._renderCodex();
+  },
+  _renderCodex(){
+    const aBox=document.getElementById('cx-arch');
+    const rBox=document.getElementById('cx-rar');
+    const archs=[['all','全部流派']].concat(Object.keys(ARCH).map(k=>[k,ARCH[k].n]));
+    const rars=[['all','全部稀有度'],['c','普通'],['u','精良'],['r','稀有'],['l','传说']];
+    aBox.innerHTML=archs.map(([k,n])=>`<div class="chip ${this._cxArch===k?'on':''}" data-a="${k}">${n}</div>`).join('');
+    rBox.innerHTML=rars.map(([k,n])=>`<div class="chip ${this._cxRar===k?'on':''}" data-r="${k}">${n}</div>`).join('');
+    aBox.querySelectorAll('.chip').forEach(el=>el.onclick=()=>{this._cxArch=el.dataset.a;this._renderCodex();});
+    rBox.querySelectorAll('.chip').forEach(el=>el.onclick=()=>{this._cxRar=el.dataset.r;this._renderCodex();});
+    const list=document.getElementById('cx-list');
+    list.innerHTML='';
+    Object.keys(CARDS).filter(id=>{
+      const c=CARDS[id];
+      return (this._cxArch==='all'||c.a===this._cxArch)&&(this._cxRar==='all'||c.r===this._cxRar);
+    }).forEach(id=>list.appendChild(this.cardEl(id,{fixed:true})));
+  },
   openDeck(){
     const s=Game.s; if(!s) return;
-    this.sheet('<h2>🃏 当前牌库（'+s.deck.length+' 张）</h2><div class="picks" id="picks"></div><button class="btn ghost" onclick="UI.closeSheet()">关闭</button>');
+    const aff=Game.affinity();
+    const total=s.deck.length||1;
+    const order=Object.keys(aff).sort((a,b)=>aff[b]-aff[a]);
+    const bar=order.map(k=>{
+      const pct=aff[k]/total*100;
+      return '<div style="width:'+pct+'%;background:'+ARCH[k].c+'" title="'+ARCH[k].n+'"></div>';
+    }).join('');
+    const legend=order.slice(0,5).map(k=>
+      '<span style="font-size:11px;color:'+ARCH[k].c+';font-weight:800;margin:0 6px">'+ARCH[k].n+' '+aff[k]+'</span>').join('');
+    this.sheet('<h2>🃏 当前牌库（'+s.deck.length+' 张）</h2>'+
+      '<div class="distbar">'+bar+'</div><div style="margin-bottom:10px">'+legend+'</div>'+
+      '<div class="picks" id="picks"></div><button class="btn ghost" onclick="UI.closeSheet()">关闭</button>');
     const box=document.getElementById('picks');
-    s.deck.forEach(id=>box.appendChild(this.cardEl(id)));
+    s.deck.forEach(id=>box.appendChild(this.cardEl(id,{fixed:true})));
   }
 };
 
