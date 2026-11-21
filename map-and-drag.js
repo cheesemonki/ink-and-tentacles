@@ -482,6 +482,11 @@
       const el = UI.cardEl(id, { fixed: true });
       el.onclick = () => {
         s.deck.splice(idx, 1);
+        if (Array.isArray(s.upgradedDeck)) {
+          s.upgradedDeck = s.upgradedDeck
+            .filter(index => index !== idx)
+            .map(index => index > idx ? index - 1 : index);
+        }
         Audio.card();
         UI.closeSheet();
         UI.top();
@@ -677,7 +682,8 @@
         charKey: s.ch.key, hp: s.hp, maxHp: s.maxHp, gold: s.gold,
         act: s.act, mapRows: s.mapRows, curRow: s.curRow,
         visitedIds: s.visitedIds, lastNodeId: s.lastNodeId,
-        deck: s.deck, relics: s.relics
+        deck: s.deck, relics: s.relics,
+        upgradedDeck: s.upgradedDeck, runStats: s.runStats, usedEvents: s.usedEvents
       }));
     } catch (e) {}
   };
@@ -968,7 +974,10 @@
             curRow: d.curRow || 0,
             visitedIds: d.visitedIds || [],
             lastNodeId: d.lastNodeId || null,
-            deck: d.deck, relics: d.relics
+            deck: d.deck, relics: d.relics,
+            upgradedDeck: Array.isArray(d.upgradedDeck) ? d.upgradedDeck : [],
+            runStats: d.runStats || Game.s.runStats,
+            usedEvents: Array.isArray(d.usedEvents) ? d.usedEvents : []
           });
           UI.map(); UI.show('scr-map'); UI.top();
         } catch (e) {}
