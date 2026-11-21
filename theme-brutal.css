@@ -1,0 +1,563 @@
+/* ============================================================
+   《墨水与触手 · 深海牌局》新粗野主义浅色硬阴影主题 (theme-brutal.css)
+   奶油纸浅底 + 粗黑直角边框 + 硬切偏移阴影 + 博物印刷卡面
+   ============================================================ */
+
+:root {
+  --paper: #f7f3e8;
+  --paper2: #fffdf7;
+  --paper3: #efe8d6;
+  --ink: #18181b;
+  --ink-soft: #4a4a52;
+  --accent-mint: #6ee7b7;
+  --accent-yellow: #fde047;
+  --accent-coral: #ff7b6b;
+  --accent-sky: #7dd3fc;
+  --accent-lav: #d8b4fe;
+  --accent-peach: #fdba74;
+  --shadow-sm: 2px 2px 0 #18181b;
+  --shadow-md: 4px 4px 0 #18181b;
+  --shadow-lg: 6px 6px 0 #18181b;
+}
+
+/* 彻底替换暗黑深海背景为浅色纸面点阵底 */
+body,
+body[data-act="1"],
+body[data-act="2"],
+body[data-act="3"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  background-image: radial-gradient(rgba(24, 24, 27, 0.14) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+}
+body[data-act="2"] { background-color: #f3efe2 !important; }
+body[data-act="3"] { background-color: #eee9db !important; }
+body::before,
+#ocean-canvas {
+  display: none !important;
+}
+
+/* 全局直角粗黑边框基础复位 */
+.topbar, .pill, .relic, .btn, .hero, .charpick, .mapbox, .arena,
+.portrait, .hpwrap, .intent, .skillbtn, .bar, .energy, .pile-btn,
+.card, .kwpanel, .chip, .sheet, .notice, .help, .dnode, .dive-map-wrap,
+.depth-meter, .depth-step, .event-choice, #log-drawer, .codex-input,
+.stats-strip span, .tagrow span, .dive-map-legend span, #turn-banner, #drop-hint {
+  border-radius: 0 !important;
+}
+
+/* ---- 顶栏 ---- */
+.topbar {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+}
+.pill {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.pill b { color: var(--ink) !important; }
+.relic {
+  background: var(--accent-yellow) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.relic:hover::after {
+  background: var(--paper2) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-radius: 0 !important;
+}
+
+/* ---- 新粗野主义直角按钮（实体按压回弹） ---- */
+.btn {
+  background: var(--accent-mint) !important;
+  color: var(--ink) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  letter-spacing: 0.4px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease !important;
+}
+.btn:hover:not([disabled]) {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 5px 5px 0 var(--ink) !important;
+  filter: none !important;
+}
+.btn:active:not([disabled]) {
+  transform: translate(3px, 3px) !important;
+  box-shadow: 1px 1px 0 var(--ink) !important;
+}
+.btn.ghost {
+  background: var(--paper2) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.btn.ghost:hover:not([disabled]) {
+  background: var(--accent-yellow) !important;
+  box-shadow: 3px 3px 0 var(--ink) !important;
+}
+.btn.pink { background: var(--accent-coral) !important; color: var(--ink) !important; }
+.btn.gold { background: var(--accent-yellow) !important; color: var(--ink) !important; }
+.btn.lav  { background: var(--accent-lav) !important; color: var(--ink) !important; }
+
+/* ---- 标题页与角色卡 ---- */
+.hero {
+  background: var(--paper2) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.hero::before { display: none !important; }
+.hero .art {
+  border-radius: 0 !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  animation: none !important;
+}
+.hero h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  color: var(--ink) !important;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+.hero .sub {
+  color: var(--ink-soft) !important;
+  font-weight: 800;
+}
+.hero p { color: var(--ink-soft) !important; font-weight: 600; }
+.tagrow span,
+.stats-strip span {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
+}
+.stats-strip b { color: #b45309 !important; }
+
+.charpick {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--ink) !important;
+}
+.charpick:hover {
+  background: #fffbeb !important;
+  border-color: var(--ink) !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0 var(--ink) !important;
+}
+.charpick .face {
+  border-radius: 0 !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+}
+.charpick h3 { color: var(--ink) !important; }
+.charpick .sp { color: var(--ink-soft) !important; }
+.charpick .sk {
+  background: var(--accent-yellow);
+  border: 1.5px solid var(--ink);
+  color: var(--ink) !important;
+  padding: 4px 8px;
+  display: inline-block;
+}
+.charpick .hp { color: var(--ink-soft) !important; font-weight: 600; }
+.charpick::after { color: var(--ink) !important; font-weight: 900; }
+
+/* ---- 自上而下深潜分支航路地图 ---- */
+.mapbox {
+  background: var(--paper2) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.mapbox h2 { color: var(--ink) !important; }
+.mapbox .hint { color: var(--ink-soft) !important; font-weight: 600; }
+.depth-meter {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+}
+.depth-step { color: var(--ink-soft) !important; }
+.depth-step.active {
+  background: var(--accent-yellow) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+}
+.dive-map-wrap {
+  background: linear-gradient(180deg, #fffdf7 0%, #f3ecda 55%, #e6dec8 100%) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: inset 0 0 0 1px rgba(24, 24, 27, 0.08);
+}
+.dive-map-legend span {
+  background: var(--paper2) !important;
+  border: 1.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  font-weight: 700;
+}
+.dive-depth-tag { color: var(--ink-soft) !important; font-weight: 900; }
+.dnode {
+  background: var(--paper2) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  opacity: 0.55;
+  box-shadow: var(--shadow-sm);
+}
+.dnode .lbl { color: var(--ink) !important; }
+.dnode .sub { color: var(--ink-soft) !important; font-weight: 600; }
+.dnode.done {
+  background: #e2e8e4 !important;
+  opacity: 0.85;
+}
+.dnode.done::after { color: #047857 !important; }
+.dnode.avail {
+  opacity: 1 !important;
+  background: var(--accent-yellow) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  animation: none !important;
+}
+.dnode.avail:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0 var(--ink) !important;
+  background: var(--accent-mint) !important;
+}
+.dnode[data-kind="elite"].avail { background: var(--accent-coral) !important; }
+.dnode[data-kind="event"].avail { background: var(--accent-lav) !important; }
+.dnode[data-kind="shop"].avail  { background: var(--accent-peach) !important; }
+.dnode[data-kind="chest"].avail { background: var(--accent-yellow) !important; }
+.dnode[data-kind="rest"].avail  { background: var(--accent-mint) !important; }
+.dnode[data-kind="boss"] {
+  background: #fee2e2 !important;
+  border: 3px solid var(--ink) !important;
+}
+.dnode[data-kind="boss"].avail {
+  background: var(--accent-coral) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ---- 战斗舞台 ---- */
+.arena {
+  background: var(--paper2) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.arena::after {
+  background: repeating-linear-gradient(180deg, var(--ink) 0, var(--ink) 6px, transparent 6px, transparent 12px) !important;
+  width: 2px !important;
+  opacity: 0.25;
+}
+.portrait {
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  background: var(--paper3) !important;
+}
+.fighter.enemy .portrait {
+  border-color: var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.fname { color: var(--ink) !important; font-size: 14.5px; }
+.fspecies { color: var(--ink-soft) !important; font-weight: 600; }
+.hpwrap {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+  height: 22px !important;
+}
+.hpfill { background: #34d399 !important; }
+.hpfill.foe { background: #fb7185 !important; }
+.hptext { color: var(--ink) !important; text-shadow: none !important; font-weight: 900; }
+
+.st {
+  border: 1.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  font-weight: 900 !important;
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+}
+.st.blk  { background: var(--accent-sky) !important; }
+.st.thr  { background: #fbcfe8 !important; }
+.st.psn  { background: #bbf7d0 !important; }
+.st.shk  { background: var(--accent-yellow) !important; }
+.st.vln  { background: #fecaca !important; }
+.st.frz  { background: #dbeafe !important; }
+.st.buff { background: var(--accent-mint) !important; }
+
+.intent {
+  border: 2.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm) !important;
+  font-weight: 900;
+}
+.intent.intent-atk  { background: #fecaca !important; }
+.intent.intent-blk  { background: #bae6fd !important; }
+.intent.intent-psn  { background: #bbf7d0 !important; }
+.intent.intent-heal { background: #a7f3d0 !important; }
+.intent.intent-mix  { background: var(--accent-yellow) !important; }
+.intent .dmg-cut { color: #0369a1 !important; }
+
+.skillbtn {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--ink) !important;
+}
+.skillbtn:hover:not(.off) {
+  background: var(--accent-yellow) !important;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--ink) !important;
+}
+.skillbtn .snm { color: var(--ink) !important; }
+.skillbtn .sds { color: var(--ink-soft) !important; font-weight: 600; }
+.skillbtn .cd {
+  background: var(--accent-mint) !important;
+  border: 1.5px solid var(--ink);
+  color: var(--ink) !important;
+}
+
+.log {
+  color: var(--ink) !important;
+  background: var(--paper2);
+  border: 2px solid var(--ink);
+  padding: 5px 12px;
+  display: block;
+  width: fit-content;
+  margin: 4px auto 10px !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.bar {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.energy {
+  background: var(--accent-yellow) !important;
+  border: 2.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.pile-btn {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+}
+.pile-btn:hover {
+  background: var(--accent-sky) !important;
+}
+.pile-btn b { color: var(--ink) !important; }
+.kbd-hint { color: var(--ink-soft) !important; font-weight: 700; }
+.kbd-hint kbd {
+  background: var(--paper2) !important;
+  border: 1.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* ---- 新粗野主义 × 海洋博物标本卡面 ---- */
+.card {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.card::after { display: none !important; }
+.card .art {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 44% !important;
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper3) !important;
+}
+.card .grad { display: none !important; }
+.card .panel {
+  top: 56% !important;
+  bottom: 0 !important;
+  background: var(--paper2) !important;
+  padding: 6px 8px 7px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.card .nm {
+  color: var(--ink) !important;
+  text-shadow: none !important;
+  border-bottom: 1.5px solid var(--ink) !important;
+  padding-bottom: 3px !important;
+  margin-bottom: 4px !important;
+  font-size: 12px !important;
+}
+.card .txt {
+  color: #27272a !important;
+  font-size: 10px !important;
+  line-height: 1.38 !important;
+}
+.card .txt .k {
+  color: #0f766e !important;
+  background: #ccfbf1;
+  padding: 0 2px;
+}
+.card .cost {
+  border-radius: 0 !important;
+  background: var(--accent-yellow) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--ink) !important;
+  box-shadow: 2px 2px 0 var(--ink) !important;
+  top: 5px !important;
+  left: 5px !important;
+}
+.card .gem {
+  border: 1.5px solid var(--ink) !important;
+  box-shadow: none !important;
+}
+.card .hotkey {
+  background: var(--paper2) !important;
+  border: 1.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+}
+.card .activation-mark {
+  border-radius: 0 !important;
+  border: 2px solid var(--ink) !important;
+  background: var(--paper2) !important;
+}
+.card[data-activation="active"] .activation-mark {
+  background: var(--accent-mint) !important;
+  box-shadow: 2px 2px 0 var(--ink) !important;
+}
+.card[data-activation="active"] .activation-mark::after {
+  background: var(--ink) !important;
+  border-radius: 0 !important;
+}
+.hand .card[data-activation="active"] {
+  outline: none !important;
+  box-shadow: 5px 5px 0 #0f766e !important;
+}
+.card:hover {
+  border-color: var(--ink) !important;
+  box-shadow: 8px 8px 0 var(--ink) !important;
+}
+.r-common   .panel { background: #fffdf7 !important; }
+.r-uncommon .panel { background: #f0f9ff !important; }
+.r-rare     .panel { background: #faf5ff !important; }
+.r-legend   .panel { background: #fefce8 !important; }
+.r-common .gem   { background: #a1a1aa !important; }
+.r-uncommon .gem { background: #38bdf8 !important; }
+.r-rare .gem     { background: #c084fc !important; }
+.r-legend .gem   { background: #facc15 !important; }
+
+/* 无配图新物种：暖纸博物标本插画框风格 */
+.card .fb.styled-fb {
+  padding-top: 14px !important;
+  gap: 3px !important;
+  background:
+    repeating-linear-gradient(0deg, rgba(24,24,27,0.03) 0, rgba(24,24,27,0.03) 1px, transparent 1px, transparent 10px),
+    #f3ebd8 !important;
+}
+.card .fb.styled-fb .fb-ico { font-size: 34px !important; filter: none !important; }
+.card .fb.styled-fb .fb-arch {
+  background: var(--paper2) !important;
+  color: var(--ink) !important;
+  border: 1.5px solid var(--ink) !important;
+  border-radius: 0 !important;
+  font-size: 9.5px !important;
+}
+.card .fb.styled-fb .fb-sp { color: var(--ink-soft) !important; }
+
+/* ---- 关键词浮窗、弹窗、图鉴、日志抽屉 ---- */
+.kwpanel {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--ink) !important;
+}
+.kwpanel .kwh { color: var(--ink-soft) !important; }
+.kwpanel .kwn { color: #0f766e !important; }
+.kwpanel .kwd { color: var(--ink) !important; }
+
+.mask { background: rgba(24, 24, 27, 0.52) !important; backdrop-filter: blur(3px) !important; }
+.sheet {
+  background: var(--paper2) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: 8px 8px 0 var(--ink) !important;
+  color: var(--ink) !important;
+}
+.sheet h2 { color: var(--ink) !important; }
+.sheet .lead { color: var(--ink-soft) !important; font-weight: 600; }
+.notice {
+  background: var(--accent-yellow) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+}
+.help {
+  background: var(--paper3) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+}
+.help b { color: #0f766e !important; }
+
+.chip {
+  background: var(--paper2) !important;
+  border: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.chip:hover { background: var(--paper3) !important; color: var(--ink) !important; }
+.chip.on { background: var(--accent-yellow) !important; color: var(--ink) !important; }
+.codex-input {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.event-choice {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.event-choice:hover:not([disabled]) {
+  background: var(--accent-yellow) !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0 var(--ink) !important;
+}
+.event-choice .ec-title { color: var(--ink) !important; }
+.event-choice .ec-desc  { color: var(--ink-soft) !important; font-weight: 600; }
+
+#log-drawer {
+  background: var(--paper2) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+#log-drawer .ld-head {
+  background: var(--accent-yellow);
+  border-bottom: 2px solid var(--ink) !important;
+  color: var(--ink) !important;
+}
+#log-drawer .ld-body { color: var(--ink) !important; }
+#log-drawer .ld-item {
+  background: var(--paper3) !important;
+  border: 1px solid rgba(24, 24, 27, 0.2);
+}
+#log-drawer .ld-item .ld-t { color: #0f766e !important; }
+
+#turn-banner {
+  background: var(--accent-yellow) !important;
+  color: var(--ink) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: var(--shadow-lg) !important;
+  text-shadow: none !important;
+}
+#drop-hint {
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.float-num {
+  text-shadow: 2px 2px 0 #18181b, -1px -1px 0 #18181b, 1px -1px 0 #18181b, -1px 1px 0 #18181b !important;
+}
