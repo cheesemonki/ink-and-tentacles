@@ -1049,7 +1049,10 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1)
 
 /* ================= UI ================= */
 const UI={
-  show(id){ ['scr-title','scr-map','scr-battle'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id)); },
+  show(id){
+    this.hideKW();
+    ['scr-title','scr-map','scr-battle'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
+  },
   log(t){ document.getElementById('log').textContent=t; },
   shake(id){ const el=document.getElementById(id); el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); },
 
@@ -1194,8 +1197,16 @@ const UI={
     });
   },
 
-  sheet(html){ document.getElementById('sheet').innerHTML=html; document.getElementById('mask').classList.add('on'); },
-  closeSheet(){ document.getElementById('mask').classList.remove('on'); document.getElementById('sheet').innerHTML=''; },
+  sheet(html){
+    this.hideKW();
+    document.getElementById('sheet').innerHTML=html;
+    document.getElementById('mask').classList.add('on');
+  },
+  closeSheet(){
+    this.hideKW();
+    document.getElementById('mask').classList.remove('on');
+    document.getElementById('sheet').innerHTML='';
+  },
 
   showKW(el,card){
     const keys=kwIn(card.d);
