@@ -180,8 +180,8 @@
   }
 
   const _newRun = Game.newRun.bind(Game);
-  Game.newRun = function (charKey) {
-    _newRun(charKey);
+  Game.newRun = function (charKey, options) {
+    _newRun(charKey, options);
     ensureUpgradeState(this.s);
   };
 

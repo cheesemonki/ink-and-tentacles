@@ -162,6 +162,7 @@
       if (s.energy < cost) return;
       el.onclick = null;
       el.style.touchAction = 'none';
+      el.addEventListener('dragstart', e => e.preventDefault());
       el.addEventListener('pointerdown', e => {
         if (e.button && e.button !== 0) return;
         if (!Game.s?.inBattle || Game.s.resolving || Game.turnStarting || Game.uiChoice) return;
@@ -677,15 +678,7 @@
     document.body.dataset.act = String(s.act || 1);
     UI.show('scr-map');
     UI.top();
-    try {
-      localStorage.setItem('ink_tentacles_save_v1', JSON.stringify({
-        charKey: s.ch.key, hp: s.hp, maxHp: s.maxHp, gold: s.gold,
-        act: s.act, mapRows: s.mapRows, curRow: s.curRow,
-        visitedIds: s.visitedIds, lastNodeId: s.lastNodeId,
-        deck: s.deck, relics: s.relics,
-        upgradedDeck: s.upgradedDeck, runStats: s.runStats, usedEvents: s.usedEvents
-      }));
-    } catch (e) {}
+    Game.saveRun();
   };
 
   Game.advance = function (wasBoss) {
@@ -957,32 +950,5 @@
     else drawLines();
   };
 
-  // 修复继续航程恢复分支地图状态
-  const _origTitle = UI.title.bind(UI);
-  UI.title = function () {
-    _origTitle();
-    const resumeBtn = document.getElementById('btn-resume-run');
-    if (resumeBtn) {
-      resumeBtn.onclick = () => {
-        try {
-          const d = JSON.parse(localStorage.getItem('ink_tentacles_save_v1') || 'null');
-          if (!d || !CHARS[d.charKey]) return;
-          Game.newRun(d.charKey);
-          Object.assign(Game.s, {
-            hp: d.hp, maxHp: d.maxHp, gold: d.gold, act: d.act,
-            mapRows: d.mapRows || generateDiveMap(d.act || 1),
-            curRow: d.curRow || 0,
-            visitedIds: d.visitedIds || [],
-            lastNodeId: d.lastNodeId || null,
-            deck: d.deck, relics: d.relics,
-            upgradedDeck: Array.isArray(d.upgradedDeck) ? d.upgradedDeck : [],
-            runStats: d.runStats || Game.s.runStats,
-            usedEvents: Array.isArray(d.usedEvents) ? d.usedEvents : []
-          });
-          UI.map(); UI.show('scr-map'); UI.top();
-        } catch (e) {}
-      };
-    }
-  };
   UI.title();
 })();

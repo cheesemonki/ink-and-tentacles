@@ -73,7 +73,10 @@
       try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
           charKey: s.ch.key, hp: s.hp, maxHp: s.maxHp, gold: s.gold,
-          act: s.act, idx: s.idx, nodes: s.nodes, deck: s.deck, relics: s.relics
+          act: s.act, idx: s.idx, nodes: s.nodes,
+          mapRows: s.mapRows, curRow: s.curRow,
+          visitedIds: s.visitedIds, lastNodeId: s.lastNodeId, usedEvents: s.usedEvents,
+          deck: s.deck, relics: s.relics, upgradedDeck: s.upgradedDeck, runStats: s.runStats
         }));
       } catch (e) {}
     },
@@ -89,11 +92,18 @@
     resume() {
       const d = this.read();
       if (!d) return;
-      Game.newRun(d.charKey);
+      Game.newRun(d.charKey, { restoring: true });
       Object.assign(Game.s, {
         hp: d.hp, maxHp: d.maxHp, gold: d.gold, act: d.act,
-        idx: d.idx, nodes: d.nodes, deck: d.deck, relics: d.relics
+        idx: d.idx || 0, nodes: d.nodes || Game.s.nodes,
+        curRow: d.curRow || 0, visitedIds: d.visitedIds || [],
+        lastNodeId: d.lastNodeId || null, usedEvents: d.usedEvents || [],
+        deck: d.deck, relics: d.relics,
+        upgradedDeck: Array.isArray(d.upgradedDeck) ? d.upgradedDeck : [],
+        runStats: d.runStats || Game.s.runStats
       });
+      if (Array.isArray(d.mapRows)) Game.s.mapRows = d.mapRows;
+      else if (Game.s.mapRows && d.act > 1) Game.buildMap(d.act);
       document.body.dataset.act = String(d.act || 1);
       UI.map(); UI.show('scr-map'); UI.top();
     }
@@ -362,12 +372,13 @@
   };
 
   const _newRun = Game.newRun.bind(Game);
-  Game.newRun = function (charKey) {
-    Stats.recordRun();
+  Game.newRun = function (charKey, { restoring = false } = {}) {
+    if (!restoring) Stats.recordRun();
     _newRun(charKey);
     document.body.dataset.act = '1';
-    RunSave.write();
+    if (!restoring) RunSave.write();
   };
+  Game.saveRun = () => RunSave.write();
 
   const _startFight = Game.startFight.bind(Game);
   Game.startFight = function (foeKey) {
