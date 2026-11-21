@@ -367,4 +367,36 @@
     gBtn.onclick = () => UI.openGuide();
     topbar.appendChild(gBtn);
   }
+
+  /* ================= 5. 自动优先加载 img/art/<card_id>.jpg 博物手绘卡图 ================= */
+  const _cardElForArt = UI.cardEl.bind(UI);
+  UI.cardEl = function (id, opts) {
+    const el = _cardElForArt(id, opts);
+    const c = CARDS[id];
+    if (!c || c.nonCollectible) return el;
+    const artBox = el.querySelector('.art');
+    const fb = el.querySelector('.fb');
+    if (!artBox) return el;
+    const customSrc = `img/art/${c.id}.jpg`;
+    const legacySrc = c.img ? `img/${c.img}.jpg` : null;
+    let img = artBox.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = c.n || '';
+      artBox.prepend(img);
+    }
+    img.hidden = false;
+    if (fb) fb.style.display = 'none';
+    img.onerror = function () {
+      if (legacySrc && !this.dataset.triedLegacy) {
+        this.dataset.triedLegacy = '1';
+        this.src = legacySrc;
+      } else {
+        this.hidden = true;
+        if (fb) fb.style.display = 'flex';
+      }
+    };
+    img.src = customSrc;
+    return el;
+  };
 })();
