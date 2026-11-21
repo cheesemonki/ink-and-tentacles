@@ -30,19 +30,22 @@ body[data-act="3"] { background-color: #e3d6bc !important; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  vertical-align: -3px;
+  width: 19px;
+  height: 19px;
+  vertical-align: -4px;
   flex-shrink: 0;
 }
-.ink-ico.lg { width: 24px; height: 24px; vertical-align: middle; }
-.ink-ico.xl { width: 30px; height: 30px; vertical-align: middle; }
+.ink-ico.lg { width: 28px; height: 28px; vertical-align: middle; }
+.ink-ico.xl { width: 38px; height: 38px; vertical-align: middle; }
 .ink-ico img,
 .ink-ico svg {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+}
+.ink-ico img {
+  mix-blend-mode: multiply;
 }
 
 /* 顶栏精简与复古印刷血条 */
