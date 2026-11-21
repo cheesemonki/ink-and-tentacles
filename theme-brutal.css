@@ -370,13 +370,13 @@ body::before,
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 44% !important;
+  bottom: 47% !important;
   border-bottom: 2px solid var(--ink);
   background: var(--paper3) !important;
 }
 .card .grad { display: none !important; }
 .card .panel {
-  top: 56% !important;
+  top: 53% !important;
   bottom: 0 !important;
   background: var(--paper2) !important;
   padding: 6px 8px 7px !important;

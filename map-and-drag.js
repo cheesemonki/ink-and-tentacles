@@ -936,7 +936,7 @@
             const b = posOf(tid);
             if (!b) return;
             const isActivePath = (s.lastNodeId === node.id && avail.has(tid)) || (visited.has(node.id) && visited.has(tid));
-            const stroke = isActivePath ? '#5eead4' : 'rgba(130, 195, 178, 0.28)';
+            const stroke = isActivePath ? '#17674d' : 'rgba(71, 61, 42, 0.55)';
             const width = isActivePath ? 3 : 2;
             const dash = visited.has(node.id) && visited.has(tid) ? '' : 'stroke-dasharray="6 5"';
             const midY = (a.bottom + b.top) / 2;
